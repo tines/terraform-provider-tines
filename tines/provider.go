@@ -59,9 +59,9 @@ func init() {
 func providerConfigure(p *schema.Provider) schema.ConfigureFunc {
 	return func(d *schema.ResourceData) (interface{}, error) {
 
-		BaseURL := d.Get("base_url")
-		Email := d.Get("email")
-		Token := d.Get("token")
+		BaseURL := d.Get("base_url").(string)
+		Email := d.Get("email").(string)
+		Token := d.Get("token").(string)
 
 		client, err := tines.NewClient(nil, BaseURL, Email, Token)
 		if err != nil {

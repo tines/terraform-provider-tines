@@ -1,9 +1,9 @@
 package tines
 
 import (
-	"github.com/tuckner/go-tines/tines"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/tuckner/go-tines/tines"
 )
 
 func Provider() terraform.ResourceProvider {
@@ -31,18 +31,17 @@ func Provider() terraform.ResourceProvider {
 
 		ResourcesMap: map[string]*schema.Resource{
 			"tines_global_resource": resourceTinesGlobalResource(),
-			"tines_agent": resourceTinesAgent(),
+			"tines_agent":           resourceTinesAgent(),
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
 			"tines_global_resource": dataSourceTinesGlobalResource(),
-			"tines_agent": dataSourceTinesAgent(),
+			"tines_agent":           dataSourceTinesAgent(),
 		},
-
-		p.ConfigureFunc = providerConfigure(p)
-
-		return p
 	}
+	p.ConfigureFunc = providerConfigure(p)
+
+	return p
 }
 
 var descriptions map[string]string

@@ -11,19 +11,19 @@ func Provider() terraform.ResourceProvider {
 		Schema: map[string]*schema.Schema{
 			"token": {
 				Type:        schema.TypeString,
-				Optional:    false,
+				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("TINES_TOKEN", nil),
 				Description: descriptions["token"],
 			},
 			"email": {
 				Type:        schema.TypeString,
-				Optional:    false,
+				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("TINES_EMAIL", nil),
 				Description: descriptions["email"],
 			},
 			"base_url": {
 				Type:        schema.TypeString,
-				Optional:    false,
+				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("TINES_URL", nil),
 				Description: descriptions["base_url"],
 			},

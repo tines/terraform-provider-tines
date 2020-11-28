@@ -37,15 +37,16 @@ func dataSourceTinesAgentRead(d *schema.ResourceData, meta interface{}) error {
 	agentID := d.Get("id")
 	log.Printf("[INFO] Reading AgentID: %s", agentID)
 
-	agent, resp, err := tinesClient.Agent.Get(agentID)
+	agent, _, err := tinesClient.Agent.Get(agentID.(int))
 	if err != nil {
 		return err
 	}
 
-	d.SetId("guid", agent.guid)
-	d.Set("agent_id", agent.id)
-	d.set("name", agent.name)
-	d.set("story_id", agent.story_id)
+	d.SetId(agent.GUID)
+	d.Set("guid", agent.GUID)
+	d.Set("agent_id", agent.ID)
+	d.Set("name", agent.Name)
+	d.Set("story_id", agent.StoryID)
 
 	return nil
 }

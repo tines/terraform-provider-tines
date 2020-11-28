@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
-	"github.com/tuckner/tf-tines/tines"
+	"github.com/tuckner/terraform-provider-tines/tines"
 )
 
 func main() {

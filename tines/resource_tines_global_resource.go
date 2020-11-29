@@ -17,11 +17,11 @@ func resourceTinesGlobalResource() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
 			"value_type": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
 			"value": {
 				Type:     schema.TypeString,
@@ -62,15 +62,15 @@ func resourceTinesGlobalResourceCreate(d *schema.ResourceData, meta interface{})
 	// d.Set("value_type", globalresource.ValueType)
 	d.Set("grid", globalresource.ID)
 
-	return resourceTinesGlobalResourceRead(d, meta)
+	return nil
 }
 
 func resourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{}) error {
 
-	grid := d.Get("grid").(int)
-
 	tinesClient := meta.(*tines.Client)
-	globalresource, _, err := tinesClient.GlobalResource.Get(grid)
+
+	grid, _ := strconv.ParseInt(d.Id(), 10, 32)
+	globalresource, _, err := tinesClient.GlobalResource.Get(int(grid))
 	if err != nil {
 		return err
 	}
@@ -88,9 +88,9 @@ func resourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{}) e
 
 func resourceTinesGlobalResourceDelete(d *schema.ResourceData, meta interface{}) error {
 
-	grid := d.Get("grid").(int)
 	tinesClient := meta.(*tines.Client)
-	_, err := tinesClient.GlobalResource.Delete(grid)
+	grid, _ := strconv.ParseInt(d.Id(), 10, 32)
+	_, err := tinesClient.GlobalResource.Delete(int(grid))
 	if err != nil {
 		return err
 	}
@@ -101,12 +101,12 @@ func resourceTinesGlobalResourceDelete(d *schema.ResourceData, meta interface{})
 
 func resourceTinesGlobalResourceUpdate(d *schema.ResourceData, meta interface{}) error {
 
+	tinesClient := meta.(*tines.Client)
+
 	name := d.Get("name").(string)
 	valueType := d.Get("value_type").(string)
 	value := d.Get("value").(string)
-	grid := d.Get("grid").(int)
-
-	tinesClient := meta.(*tines.Client)
+	grid, _ := strconv.ParseInt(d.Id(), 10, 32)
 
 	gr := tines.GlobalResource{
 		Name:      name,
@@ -114,7 +114,7 @@ func resourceTinesGlobalResourceUpdate(d *schema.ResourceData, meta interface{})
 		Value:     value,
 	}
 
-	globalresource, _, err := tinesClient.GlobalResource.Update(grid, &gr)
+	globalresource, _, err := tinesClient.GlobalResource.Update(int(grid), &gr)
 	if err != nil {
 		return err
 	}

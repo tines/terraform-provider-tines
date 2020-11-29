@@ -133,7 +133,7 @@ func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
 		return nil, err
 	}
 
-	err = CheckResponse(httpResp)
+	err = CheckResponse(httpResp, req)
 	if err != nil {
 		// Even though there was an error, we still return the response
 		// in case the caller wants to inspect it further
@@ -154,12 +154,12 @@ func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
 // A response is considered an error if it has a status code outside the 200 range.
 // The caller is responsible to analyze the response body.
 // The body can contain JSON (if the error is intended) or xml (sometimes Jira just failes).
-func CheckResponse(r *http.Response) error {
+func CheckResponse(r *http.Response, req *http.Request) error {
 	if c := r.StatusCode; 200 <= c && c <= 299 {
 		return nil
 	}
 
-	err := fmt.Errorf("request failed. Please analyze the request body for more details. Status code: %d", r.StatusCode)
+	err := fmt.Errorf("request failed. Please analyze the request body for more details. Status code: %d. Resp Body: %d. Req URL: %d", r.StatusCode, r.Body, req.URL)
 	return err
 }
 

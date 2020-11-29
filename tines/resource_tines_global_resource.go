@@ -60,14 +60,14 @@ func resourceTinesGlobalResourceCreate(d *schema.ResourceData, meta interface{})
 	// d.Set("name", globalresource.Name)
 	// d.Set("value", globalresource.Value)
 	// d.Set("value_type", globalresource.ValueType)
-	// d.Set("grid", globalresource.ID)
+	d.Set("grid", globalresource.ID)
 
 	return resourceTinesGlobalResourceRead(d, meta)
 }
 
 func resourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{}) error {
 
-	grid := d.Get("sgrid").(int)
+	grid := d.Get("grid").(int)
 
 	tinesClient := meta.(*tines.Client)
 	globalresource, _, err := tinesClient.GlobalResource.Get(grid)
@@ -88,7 +88,7 @@ func resourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{}) e
 
 func resourceTinesGlobalResourceDelete(d *schema.ResourceData, meta interface{}) error {
 
-	grid := d.Get("sgrid").(int)
+	grid := d.Get("grid").(int)
 	tinesClient := meta.(*tines.Client)
 	_, err := tinesClient.GlobalResource.Delete(grid)
 	if err != nil {
@@ -104,7 +104,7 @@ func resourceTinesGlobalResourceUpdate(d *schema.ResourceData, meta interface{})
 	name := d.Get("name").(string)
 	valueType := d.Get("value_type").(string)
 	value := d.Get("value").(string)
-	grid := d.Get("sgrid").(int)
+	grid := d.Get("grid").(int)
 
 	tinesClient := meta.(*tines.Client)
 

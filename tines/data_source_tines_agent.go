@@ -14,7 +14,7 @@ func dataSourceTinesAgent() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"id": {
 				Type:     schema.TypeInt,
-				Required: true,
+				Optional: true,
 			},
 			"guid": {
 				Type:     schema.TypeString,
@@ -33,16 +33,18 @@ func dataSourceTinesAgent() *schema.Resource {
 }
 
 func dataSourceTinesAgentRead(d *schema.ResourceData, meta interface{}) error {
-	tinesClient := meta.(*tines.Client)
-	agentID := d.Get("id")
-	log.Printf("[INFO] Reading AgentID: %s", agentID)
 
-	agent, _, err := tinesClient.Agent.Get(agentID.(int))
+	tinesClient := meta.(*tines.Client)
+	agentID := d.Get("id").(int)
+	log.Printf("[INFO] Reading AgentID: %v", agentID)
+
+	agent, _, err := tinesClient.Agent.Get(agentID)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(agent.GUID)
+	GUID := agent.GUID
+	d.SetId(GUID)
 	d.Set("guid", agent.GUID)
 	d.Set("agent_id", agent.ID)
 	d.Set("name", agent.Name)

@@ -1,9 +1,9 @@
 TEST?=$$(go list ./... | grep -v 'vendor')
-HOSTNAME=tines.io
-NAMESPACE=io
+HOSTNAME=github.com
+NAMESPACE=tuckner
 NAME=tines
 BINARY=terraform-provider-${NAME}
-VERSION=0.0.2go
+VERSION=0.0.3
 OS_ARCH=darwin_amd64
 
 default: install

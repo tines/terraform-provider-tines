@@ -6,6 +6,7 @@ import (
 	"github.com/tuckner/go-tines/tines"
 )
 
+// Provider for Tines
 func Provider() terraform.ResourceProvider {
 	p := &schema.Provider{
 		Schema: map[string]*schema.Schema{
@@ -30,7 +31,7 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			// "tines_global_resource": resourceTinesGlobalResource(),
+			"tines_global_resource": resourceTinesGlobalResource(),
 			// "tines_agent":           resourceTinesAgent(),
 		},
 

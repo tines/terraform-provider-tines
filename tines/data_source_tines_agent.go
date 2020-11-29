@@ -2,6 +2,7 @@ package tines
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/tuckner/go-tines/tines"
@@ -35,16 +36,16 @@ func dataSourceTinesAgent() *schema.Resource {
 func dataSourceTinesAgentRead(d *schema.ResourceData, meta interface{}) error {
 
 	tinesClient := meta.(*tines.Client)
-	agentID := d.Get("id").(int)
-	log.Printf("[INFO] Reading AgentID: %v", agentID)
-
-	agent, _, err := tinesClient.Agent.Get(agentID)
+	aid := d.Get("id").(int)
+	log.Printf("[INFO] Reading AgentID: %v", aid)
+	agent, _, err := tinesClient.Agent.Get(aid)
 	if err != nil {
 		return err
 	}
 
-	GUID := agent.GUID
-	d.SetId(GUID)
+	said := strconv.Itoa(agent.ID)
+
+	d.SetId(said)
 	d.Set("guid", agent.GUID)
 	d.Set("agent_id", agent.ID)
 	d.Set("name", agent.Name)

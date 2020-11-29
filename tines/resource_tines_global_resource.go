@@ -57,10 +57,6 @@ func resourceTinesGlobalResourceCreate(d *schema.ResourceData, meta interface{})
 	sgrid := strconv.Itoa(globalresource.ID)
 
 	d.SetId(sgrid)
-	// d.Set("name", globalresource.Name)
-	// d.Set("value", globalresource.Value)
-	// d.Set("value_type", globalresource.ValueType)
-	// d.Set("grid", globalresource.ID)
 
 	return resourceTinesGlobalResourceRead(d, meta)
 }

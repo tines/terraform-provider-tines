@@ -60,9 +60,9 @@ func resourceTinesGlobalResourceCreate(d *schema.ResourceData, meta interface{})
 	// d.Set("name", globalresource.Name)
 	// d.Set("value", globalresource.Value)
 	// d.Set("value_type", globalresource.ValueType)
-	d.Set("grid", globalresource.ID)
+	// d.Set("grid", globalresource.ID)
 
-	return nil
+	return resourceTinesGlobalResourceRead(d, meta)
 }
 
 func resourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{}) error {

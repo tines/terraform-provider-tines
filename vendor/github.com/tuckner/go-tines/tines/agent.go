@@ -32,14 +32,14 @@ type Agent struct {
 	CreatedAt          time.Time   `json:"created_at" structs:"created_at,omitempty"`
 	UpdatedAt          time.Time   `json:"updated_at" structs:"updated_at,omitempty"`
 	LastWebRequestAt   interface{} `json:"last_web_request_at" structs:"last_web_request_at,omitempty"`
-	KeepEventsFor      int         `json:"keep_events_for" structs:"keep_events_for`
+	KeepEventsFor      int         `json:"keep_events_for" structs:"keep_events_for,omitempty"`
 	LastEventAt        time.Time   `json:"last_event_at" structs:"last_event_at,omitempty"`
 	LastErrorLogAt     interface{} `json:"last_error_log_at" structs:"last_error_log_at,omitempty"`
 	Disabled           bool        `json:"disabled" structs:"disabled,omitempty"`
 	GUID               string      `json:"guid" structs:"guid,omitempty"`
 	StoryID            int         `json:"story_id" structs:"story_id"`
-	SourceIds          []string    `json:"source_ids" structs:"source_ids,omitempty"`
-	ReceiverIds        []string    `json:"receiver_ids" structs:"receiver_ids,omitempty`
+	SourceIds          []int       `json:"source_ids" structs:"source_ids,omitempty"`
+	ReceiverIds        []int       `json:"receiver_ids" structs:"receiver_ids,omitempty"`
 	Type               string      `json:"type" structs:"type,omitempty"`
 	Unknowns           tcontainer.MarshalMap
 }
@@ -160,7 +160,7 @@ func (s *AgentService) CreateWithContext(ctx context.Context, agent *Agent) (*Ag
 	}
 
 	agentresp := new(Agent)
-	resp, err := s.client.Do(req, nil)
+	resp, err := s.client.Do(req, agentresp)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -182,7 +182,7 @@ func (s *AgentService) UpdateWithContext(ctx context.Context, agentID int, agent
 	}
 
 	agentresp := new(Agent)
-	resp, err := s.client.Do(req, nil)
+	resp, err := s.client.Do(req, agentresp)
 	if err != nil {
 		return nil, resp, err
 	}

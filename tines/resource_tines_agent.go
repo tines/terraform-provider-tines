@@ -36,21 +36,9 @@ func resourceTinesAgent() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"options": {
-				Type:     schema.TypeMap,
+			"agent_options": {
+				Type:     schema.TypeString,
 				Optional: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"secret": {
-							Type:     schema.TypeString,
-							Optional: true,
-						},
-						"verbs": {
-							Type:     schema.TypeString,
-							Optional: true,
-						},
-					},
-				},
 			},
 			"user_id": {
 				Type:     schema.TypeInt,
@@ -101,8 +89,7 @@ func resourceTinesAgentCreate(d *schema.ResourceData, meta interface{}) error {
 	keepEventsFor := d.Get("keep_events_for").(int)
 	sourceRaw := d.Get("source_ids").([]interface{})
 	receiveRaw := d.Get("receiver_ids").([]interface{})
-	// Todo: enable options
-	// options := d.Get("options").(map[string]interface{})
+	options := d.Get("agent_options").(string)
 
 	receiveID := make([]int, len(receiveRaw))
 	for i, v := range receiveRaw {
@@ -115,9 +102,8 @@ func resourceTinesAgentCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	custom := tcontainer.NewMarshalMap()
-	// Hardcode
-	// custom["options"] = map[string]string{"secret": "secretphrase", "verbs": "get,post"}
-	custom["options"] = d.Get("options")
+	custom["options"] = options
+	// log.Printf("[DEBUG] Options block: %v", custom)
 
 	a := tines.Agent{
 		Name:          name,
@@ -188,8 +174,7 @@ func resourceTinesAgentUpdate(d *schema.ResourceData, meta interface{}) error {
 	keepEventsFor := d.Get("keep_events_for").(int)
 	sourceRaw := d.Get("source_ids").([]interface{})
 	receiveRaw := d.Get("receiver_ids").([]interface{})
-	// Todo: enable options
-	// options := d.Get("options").(map[string]interface{})
+	options := d.Get("agent_options").(string)
 
 	receiveID := make([]int, len(receiveRaw))
 	for i, v := range receiveRaw {
@@ -202,9 +187,8 @@ func resourceTinesAgentUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	custom := tcontainer.NewMarshalMap()
-	// Todo: enable options
-	// custom["options"] = map[string]string{"secret": "secretphrase", "verbs": "get,post"}
-	custom["options"] = d.Get("options")
+	custom["options"] = options
+	// log.Printf("[DEBUG] Options block: %v", custom)
 
 	a := tines.Agent{
 		Name:          name,

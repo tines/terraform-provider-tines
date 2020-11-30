@@ -37,7 +37,6 @@ func dataSourceTinesAgentRead(d *schema.ResourceData, meta interface{}) error {
 
 	tinesClient := meta.(*tines.Client)
 	aid := d.Get("id").(int)
-	log.Printf("[INFO] Reading AgentID: %v", aid)
 	agent, _, err := tinesClient.Agent.Get(aid)
 	if err != nil {
 		return err

@@ -38,6 +38,7 @@ func Provider() terraform.ResourceProvider {
 		DataSourcesMap: map[string]*schema.Resource{
 			"tines_global_resource": dataSourceTinesGlobalResource(),
 			"tines_agent":           dataSourceTinesAgent(),
+			"tines_story":           dataSourceTinesStory(),
 		},
 	}
 	p.ConfigureFunc = providerConfigure(p)

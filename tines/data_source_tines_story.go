@@ -9,7 +9,7 @@ import (
 
 func dataSourceTinesStory() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceTinesAgentRead,
+		Read: dataSourceTinesStoryRead,
 
 		Schema: map[string]*schema.Schema{
 			"id": {

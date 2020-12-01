@@ -12,9 +12,9 @@ func dataSourceTinesAgent() *schema.Resource {
 		Read: dataSourceTinesAgentRead,
 
 		Schema: map[string]*schema.Schema{
-			"aid": {
+			"agent_id": {
 				Type:     schema.TypeInt,
-				Computed: true,
+				Optional: true,
 			},
 			"guid": {
 				Type:     schema.TypeString,

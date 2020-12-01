@@ -27,7 +27,7 @@ func resourceTinesGlobalResource() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"grid": {
+			"global_resource_id": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
@@ -77,7 +77,7 @@ func resourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("name", globalresource.Name)
 	d.Set("value", globalresource.Value)
 	d.Set("value_type", globalresource.ValueType)
-	d.Set("grid", globalresource.ID)
+	d.Set("global_resource_id", globalresource.ID)
 
 	return nil
 }

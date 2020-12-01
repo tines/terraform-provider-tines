@@ -16,7 +16,7 @@ func resourceTinesAgent() *schema.Resource {
 		Delete: resourceTinesAgentDelete,
 
 		Schema: map[string]*schema.Schema{
-			"aid": {
+			"agent_id": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
@@ -142,7 +142,7 @@ func resourceTinesAgentRead(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(said)
 	d.Set("name", agent.Name)
 	d.Set("guid", agent.GUID)
-	d.Set("aid", agent.ID)
+	d.Set("agent_id", agent.ID)
 	d.Set("story_id", agent.StoryID)
 	d.Set("user_id", agent.UserID)
 	d.Set("agent_type", d.Get("agent_type").(string))

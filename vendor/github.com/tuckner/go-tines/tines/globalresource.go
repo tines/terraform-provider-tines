@@ -136,7 +136,7 @@ func (s *GlobalResourceService) DeleteWithContext(ctx context.Context, globalRes
 	return resp, nil
 }
 
-// Delete wraps GetWithContext using the background context.
+// Delete wraps DeleteWithContext using the background context.
 func (s *GlobalResourceService) Delete(globalResourceID int) (*Response, error) {
 	return s.DeleteWithContext(context.Background(), globalResourceID)
 }

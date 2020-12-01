@@ -1,7 +1,6 @@
 package tines
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"

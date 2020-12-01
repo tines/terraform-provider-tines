@@ -17,3 +17,13 @@ make install
 ```
 
 * You may fail at this step, check your distribution and update the Makefile "OS_ARCH" if not using OSX.
+
+## Authentication
+
+Authentication parameters can be set as environment variables
+
+```
+export TF_VAR_tines_email=example@email.com
+export TF_VAR_tines_email=token
+export TF_VAR_tines_base_url=https://dappled-horse-1234.tines.io/
+```

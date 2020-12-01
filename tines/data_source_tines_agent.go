@@ -1,7 +1,6 @@
 package tines
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -13,21 +12,64 @@ func dataSourceTinesAgent() *schema.Resource {
 		Read: dataSourceTinesAgentRead,
 
 		Schema: map[string]*schema.Schema{
-			"id": {
+			"aid": {
 				Type:     schema.TypeInt,
-				Optional: true,
+				Computed: true,
 			},
 			"guid": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"story_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:     schema.TypeInt,
+				Optional: true,
 			},
 			"name": {
 				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"agent_type": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"agent_options": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"user_id": {
+				Type:     schema.TypeInt,
 				Computed: true,
+			},
+			"keep_events_for": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  604800,
+			},
+			"cron": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"timezone": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"disabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"source_ids": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeInt,
+				},
+			},
+			"receiver_ids": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeInt,
+				},
 			},
 		},
 	}
@@ -37,7 +79,6 @@ func dataSourceTinesAgentRead(d *schema.ResourceData, meta interface{}) error {
 
 	tinesClient := meta.(*tines.Client)
 	aid := d.Get("id").(int)
-	log.Printf("[INFO] Reading AgentID: %v", aid)
 	agent, _, err := tinesClient.Agent.Get(aid)
 	if err != nil {
 		return err

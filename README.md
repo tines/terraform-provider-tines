@@ -5,3 +5,15 @@
 Terraform `0.13.x` or greater
 
 Go `1.12.x` or greater
+
+## Install
+
+```
+mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
+git clone https://github.com/tuckner/terraform-provider-tines.git
+cd $GOPATH/src/github.com/terraform-providers/terraform-provider-tines
+export GO111MODULE="on"
+make install
+```
+
+* You may fail at this step, check your distribution and update the Makefile "OS_ARCH" if not using OSX.

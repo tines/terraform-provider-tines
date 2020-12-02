@@ -40,7 +40,7 @@ resource "tines_agent" "webhook_confirm" {
   agent_type = "Agents::HTTPRequestAgent"
   story_id = 31
   keep_events_for = 604800
-  source_ids = [tines_agent.webhook.aid]
+  source_ids = [tines_agent.webhook.agent_id]
   receiver_ids = []
   agent_options = jsonencode({
     "url": "{{ .webhook_agent.body.SubscribeURL }}",

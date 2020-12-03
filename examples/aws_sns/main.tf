@@ -25,7 +25,7 @@ resource "random_id" "webhook_secret" {
 resource "tines_agent" "webhook" {
   name = "Webhook Agent"
   agent_type = "Agents::WebhookAgent"
-  story_id = 31
+  story_id = var.story_id
   keep_events_for = 604800
   source_ids = []
   receiver_ids = []
@@ -38,7 +38,7 @@ resource "tines_agent" "webhook" {
 resource "tines_agent" "webhook_confirm" {
   name = "Webhook Confirm"
   agent_type = "Agents::HTTPRequestAgent"
-  story_id = 31
+  story_id = var.story_id
   keep_events_for = 604800
   source_ids = [tines_agent.webhook.agent_id]
   receiver_ids = []

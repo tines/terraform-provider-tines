@@ -9,3 +9,7 @@ variable "tines_email" {
 variable "tines_base_url" {
     type = string
 }
+
+variable "story_id" {
+    type = number
+}

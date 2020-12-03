@@ -13,3 +13,7 @@ variable "tines_base_url" {
 variable "aws_topic_arn" {
     type = string
 }
+
+variable "story_id" {
+    type = number
+}

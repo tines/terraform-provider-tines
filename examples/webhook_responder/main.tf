@@ -26,7 +26,7 @@ resource "tines_global_resource" "ip_list" {
 resource "tines_agent" "webhook" {
   name = "Webhook Agent"
   agent_type = "Agents::WebhookAgent"
-  story_id = 31
+  story_id = var.story_id
   keep_events_for = 604800
   source_ids = []
   receiver_ids = []

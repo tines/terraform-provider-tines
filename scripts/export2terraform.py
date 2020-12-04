@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# I know its ugly but it does the job for now.
+
 import json
 
 with open('export.json', 'r') as e:

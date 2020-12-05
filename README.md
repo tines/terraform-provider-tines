@@ -34,6 +34,6 @@ Tines utilizes circular logic and loops frequently, however, that is a barrier i
 
 `Error: Cycle ....`
 
-In order to get passed this error, set the source and receiver IDs of the Agent which finishes the loop and remove the dependency from the beginning of the loop. 
+In order to get passed this error, set the source and receiver IDs of the first agent which begins the loop and remove the agent receiver ID from the agent which triggers the loop to being in order remove the circular reference. 
 
 [More information](https://serverfault.com/questions/1005761/what-does-error-cycle-means-in-terraform#:~:text=When%20Terraform%20returns%20this%20error,that%20it's%20no%20longer%20contradictory.&text=The%20%2Ddraw%2Dcycles%20command%20causes,reported%20using%20the%20color%20red.)

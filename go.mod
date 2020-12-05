@@ -30,7 +30,7 @@ require (
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/spf13/afero v1.4.1 // indirect
 	github.com/trivago/tgo v1.0.7
-	github.com/tuckner/go-tines v0.0.0-20201201024726-cc766d90932a
+	github.com/tuckner/go-tines v0.0.0-20201202211244-e58cd0093f09
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/tagparser v0.1.2 // indirect
 	github.com/zclconf/go-cty v1.7.0 // indirect

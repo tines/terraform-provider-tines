@@ -353,6 +353,8 @@ github.com/tuckner/go-tines v0.0.0-20201129174315-1523529b2f16 h1:RrY1kAhBMuWKAS
 github.com/tuckner/go-tines v0.0.0-20201129174315-1523529b2f16/go.mod h1:mi0a2ag0sxrUs/WoQvsuKJA70ktQIw86NVS+s53aYww=
 github.com/tuckner/go-tines v0.0.0-20201201024726-cc766d90932a h1:F7NakjibLGpcCFdsX/CFdjFcc5YUd10axDICKvaj3Gc=
 github.com/tuckner/go-tines v0.0.0-20201201024726-cc766d90932a/go.mod h1:mi0a2ag0sxrUs/WoQvsuKJA70ktQIw86NVS+s53aYww=
+github.com/tuckner/go-tines v0.0.0-20201202211244-e58cd0093f09 h1:gITYJWL4pladfw0KxNh4IN9jpDsDvEALFySBIkskjZ0=
+github.com/tuckner/go-tines v0.0.0-20201202211244-e58cd0093f09/go.mod h1:mi0a2ag0sxrUs/WoQvsuKJA70ktQIw86NVS+s53aYww=
 github.com/ulikunitz/xz v0.5.5/go.mod h1:2bypXElzHzzJZwzH67Y6wb67pO62Rzfn7BSiF4ABRW8=
 github.com/ulikunitz/xz v0.5.7 h1:YvTNdFzX6+W5m9msiYg/zpkSURPPtOlzbqYjrFn7Yt4=
 github.com/ulikunitz/xz v0.5.7/go.mod h1:nbz6k7qbPmH4IRqmfOplQw/tblSgqTqBwxkY0oWt/14=

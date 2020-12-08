@@ -43,6 +43,10 @@ def format_receiver(data):
   return data
 
 def run(export, output, readme):
+    
+  if sys.version_info[0] != 3:
+    print("This script requires Python 3")
+    sys.exit(1)
   with open(export, 'r') as e:
     export_data = json.load(e)
 

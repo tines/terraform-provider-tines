@@ -19,7 +19,7 @@ resource "tines_agent" "{{ agent.name | lower | replace(" ", "_")  }}" {
     story_id = var.story_id
     keep_events_for = {{ agent.keep_events_for }}
     source_ids = []
-    receiver_ids = {{ agent.receiver_ids }}
+    receiver_ids = [{{ agent.receiver_ids | join(', ') }}]
     agent_options = jsonencode({{ agent.options }})
 }
 {% endfor %}

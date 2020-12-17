@@ -24,7 +24,7 @@ Authentication parameters can be set as environment variables
 
 ```
 export TF_VAR_tines_email=example@email.com
-export TF_VAR_tines_email=token
+export TF_VAR_tines_token=token
 export TF_VAR_tines_base_url=https://dappled-horse-1234.tines.io/
 ```
 

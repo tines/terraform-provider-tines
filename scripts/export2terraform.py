@@ -3,10 +3,12 @@
 # I know its ugly but it does the job for now.
 
 
-from jinja2 import Environment, FileSystemLoader, Template
-import json
 import argparse
+import json
+import sys
 from os.path import abspath
+
+from jinja2 import Environment, FileSystemLoader, Template
 
 rdme = """# {{ data.name }}
 {{ data.description }}

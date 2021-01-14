@@ -27,6 +27,10 @@ func resourceTinesGlobalResource() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"team_id": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 			"global_resource_id": {
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -40,6 +44,7 @@ func resourceTinesGlobalResourceCreate(d *schema.ResourceData, meta interface{})
 	name := d.Get("name").(string)
 	valueType := d.Get("value_type").(string)
 	value := d.Get("value").(string)
+	teamID := d.Get("team_id").(int)
 
 	tinesClient := meta.(*tines.Client)
 
@@ -47,6 +52,7 @@ func resourceTinesGlobalResourceCreate(d *schema.ResourceData, meta interface{})
 		Name:      name,
 		ValueType: valueType,
 		Value:     value,
+		TeamID:    teamID,
 	}
 
 	globalresource, _, err := tinesClient.GlobalResource.Create(&gr)
@@ -77,6 +83,7 @@ func resourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("name", globalresource.Name)
 	d.Set("value", globalresource.Value)
 	d.Set("value_type", globalresource.ValueType)
+	d.Set("team_id", globalresource.TeamID)
 	d.Set("global_resource_id", globalresource.ID)
 
 	return nil
@@ -102,12 +109,14 @@ func resourceTinesGlobalResourceUpdate(d *schema.ResourceData, meta interface{})
 	name := d.Get("name").(string)
 	valueType := d.Get("value_type").(string)
 	value := d.Get("value").(string)
+	teamID := d.Get("team_id").(int)
 	grid, _ := strconv.ParseInt(d.Id(), 10, 32)
 
 	gr := tines.GlobalResource{
 		Name:      name,
 		ValueType: valueType,
 		Value:     value,
+		TeamID:    teamID,
 	}
 
 	globalresource, _, err := tinesClient.GlobalResource.Update(int(grid), &gr)

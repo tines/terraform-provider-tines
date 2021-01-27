@@ -16,7 +16,7 @@ export GO111MODULE="on"
 make install
 ```
 
-* You may fail at this step, check your distribution and update the Makefile "OS_ARCH" if not using OSX (i.e. `linux_amd64` for Linux)
+* You may fail at this step, check your distribution and update the Makefile "OS_ARCH" (i.e. `linux_amd64` for Linux)
 
 ## Authentication
 

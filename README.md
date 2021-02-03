@@ -28,6 +28,12 @@ export TF_VAR_tines_token=token
 export TF_VAR_tines_base_url=https://dappled-horse-1234.tines.io/
 ```
 
+## Export Conversion
+
+Tines exports can be transformed into Terraform files utilizing the `export2terraform` script in the scripts directory. Alternatively, there is a service available that will convert story exports to Terraform files and email the resulting files:
+
+https://quiet-vista-5142.tines.io/forms/91784f6d80499f2810ab9a31d0c15b72
+
 # Circular Logic
 
 Tines utilizes circular logic and loops frequently, however, that is a barrier in using Terraform effectively because it cannot know which resources to create first. When running `terraform plan` or `terraform apply` you may run into an error like:

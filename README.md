@@ -28,6 +28,10 @@ export TF_VAR_tines_token=token
 export TF_VAR_tines_base_url=https://dappled-horse-1234.tines.io/
 ```
 
+## Examples
+
+More examples can be found here: https://github.com/tuckner/tines-example-stories
+
 ## Export Conversion
 
 Tines exports can be transformed into Terraform files utilizing the `export2terraform` script in the scripts directory. Alternatively, there is a service available that will convert story exports to Terraform files and email the resulting files:

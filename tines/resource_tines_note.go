@@ -24,8 +24,9 @@ func resourceTinesNote() *schema.Resource {
 				Optional: true,
 			},
 			"position": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeMap,
 				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"story_id": {
 				Type:     schema.TypeInt,
@@ -37,7 +38,7 @@ func resourceTinesNote() *schema.Resource {
 
 func resourceTinesNoteCreate(d *schema.ResourceData, meta interface{}) error {
 
-	position := d.Get("position").(string)
+	position := d.Get("position").(map[string]interface{})
 	content := d.Get("content").(string)
 	storyID := d.Get("story_id").(int)
 
@@ -99,7 +100,7 @@ func resourceTinesNoteUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	tinesClient := meta.(*tines.Client)
 
-	position := d.Get("position").(string)
+	position := d.Get("position").(map[string]interface{})
 	content := d.Get("content").(string)
 	storyID := d.Get("story_id").(int)
 	nid, _ := strconv.ParseInt(d.Id(), 10, 32)

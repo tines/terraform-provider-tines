@@ -61,6 +61,11 @@ func resourceTinesAgent() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
+			"position": {
+				Type:     schema.TypeMap,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"source_ids": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -90,6 +95,7 @@ func resourceTinesAgentCreate(d *schema.ResourceData, meta interface{}) error {
 	sourceRaw := d.Get("source_ids").([]interface{})
 	receiveRaw := d.Get("receiver_ids").([]interface{})
 	options := d.Get("agent_options").(string)
+	position := d.Get("position").(map[string]interface{})
 
 	receiveID := make([]int, len(receiveRaw))
 	for i, v := range receiveRaw {
@@ -112,6 +118,7 @@ func resourceTinesAgentCreate(d *schema.ResourceData, meta interface{}) error {
 		KeepEventsFor: keepEventsFor,
 		SourceIds:     sourceID,
 		ReceiverIds:   receiveID,
+		Position:      position,
 		Unknowns:      custom,
 	}
 
@@ -145,6 +152,7 @@ func resourceTinesAgentRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("agent_id", agent.ID)
 	d.Set("story_id", agent.StoryID)
 	d.Set("user_id", agent.UserID)
+	d.Set("position", agent.Position)
 	d.Set("agent_type", d.Get("agent_type").(string))
 
 	return nil
@@ -172,6 +180,7 @@ func resourceTinesAgentUpdate(d *schema.ResourceData, meta interface{}) error {
 	agentType := d.Get("agent_type").(string)
 	storyID := d.Get("story_id").(int)
 	keepEventsFor := d.Get("keep_events_for").(int)
+	position := d.Get("position").(map[string]interface{})
 	sourceRaw := d.Get("source_ids").([]interface{})
 	receiveRaw := d.Get("receiver_ids").([]interface{})
 	options := d.Get("agent_options").(string)
@@ -197,6 +206,7 @@ func resourceTinesAgentUpdate(d *schema.ResourceData, meta interface{}) error {
 		KeepEventsFor: keepEventsFor,
 		SourceIds:     sourceID,
 		ReceiverIds:   receiveID,
+		Position:      position,
 		Unknowns:      custom,
 	}
 

@@ -13,10 +13,10 @@ type NoteService struct {
 
 // Note structure
 type Note struct {
-	ID       int         `json:"id" structs:"id,omitempty"`
-	StoryID  int         `json:"story_id" structs:"story_id"`
-	Content  string      `json:"content" structs:"content,omitempty"`
-	Position interface{} `json:"position" structs:"position,omitempty"`
+	ID       int                    `json:"id" structs:"id,omitempty"`
+	StoryID  int                    `json:"story_id" structs:"story_id"`
+	Content  string                 `json:"content" structs:"content,omitempty"`
+	Position map[string]interface{} `json:"position" structs:"position,omitempty"`
 }
 
 // GetWithContext returns an note for the given note key.

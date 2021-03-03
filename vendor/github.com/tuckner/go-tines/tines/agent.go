@@ -21,27 +21,27 @@ type AgentService struct {
 
 // Agent structure
 type Agent struct {
-	ID                 int         `json:"id" structs:"id,omitempty"`
-	UserID             int         `json:"user_id" structs:"user_id,omitempty"`
-	Name               string      `json:"name" structs:"name"`
-	Schedule           interface{} `json:"schedule" structs:"schedule,omitempty"`
-	EventsCount        int         `json:"events_count" structs:"events_count,omitempty"`
-	LastCheckAt        interface{} `json:"last_check_at" structs:"last_check_at,omitempty"`
-	LastReceiveAt      time.Time   `json:"last_receive_at" structs:"last_receive_at,omitempty"`
-	LastCheckedEventID int         `json:"last_checked_event_id" structs:"last_checked_event_id,omitempty"`
-	CreatedAt          time.Time   `json:"created_at" structs:"created_at,omitempty"`
-	UpdatedAt          time.Time   `json:"updated_at" structs:"updated_at,omitempty"`
-	LastWebRequestAt   interface{} `json:"last_web_request_at" structs:"last_web_request_at,omitempty"`
-	KeepEventsFor      int         `json:"keep_events_for" structs:"keep_events_for,omitempty"`
-	LastEventAt        time.Time   `json:"last_event_at" structs:"last_event_at,omitempty"`
-	LastErrorLogAt     interface{} `json:"last_error_log_at" structs:"last_error_log_at,omitempty"`
-	Disabled           bool        `json:"disabled" structs:"disabled,omitempty"`
-	GUID               string      `json:"guid" structs:"guid,omitempty"`
-	StoryID            int         `json:"story_id" structs:"story_id"`
-	SourceIds          []int       `json:"source_ids" structs:"source_ids,omitempty"`
-	ReceiverIds        []int       `json:"receiver_ids" structs:"receiver_ids,omitempty"`
-	Type               string      `json:"type" structs:"type,omitempty"`
-	Position           interface{} `json:"position" structs:"position,omitempty"`
+	ID                 int                    `json:"id" structs:"id,omitempty"`
+	UserID             int                    `json:"user_id" structs:"user_id,omitempty"`
+	Name               string                 `json:"name" structs:"name"`
+	Schedule           interface{}            `json:"schedule" structs:"schedule,omitempty"`
+	EventsCount        int                    `json:"events_count" structs:"events_count,omitempty"`
+	LastCheckAt        interface{}            `json:"last_check_at" structs:"last_check_at,omitempty"`
+	LastReceiveAt      time.Time              `json:"last_receive_at" structs:"last_receive_at,omitempty"`
+	LastCheckedEventID int                    `json:"last_checked_event_id" structs:"last_checked_event_id,omitempty"`
+	CreatedAt          time.Time              `json:"created_at" structs:"created_at,omitempty"`
+	UpdatedAt          time.Time              `json:"updated_at" structs:"updated_at,omitempty"`
+	LastWebRequestAt   interface{}            `json:"last_web_request_at" structs:"last_web_request_at,omitempty"`
+	KeepEventsFor      int                    `json:"keep_events_for" structs:"keep_events_for,omitempty"`
+	LastEventAt        time.Time              `json:"last_event_at" structs:"last_event_at,omitempty"`
+	LastErrorLogAt     interface{}            `json:"last_error_log_at" structs:"last_error_log_at,omitempty"`
+	Disabled           bool                   `json:"disabled" structs:"disabled,omitempty"`
+	GUID               string                 `json:"guid" structs:"guid,omitempty"`
+	StoryID            int                    `json:"story_id" structs:"story_id"`
+	SourceIds          []int                  `json:"source_ids" structs:"source_ids,omitempty"`
+	ReceiverIds        []int                  `json:"receiver_ids" structs:"receiver_ids,omitempty"`
+	Type               string                 `json:"type" structs:"type,omitempty"`
+	Position           map[string]interface{} `json:"position" structs:"position,omitempty"`
 	Unknowns           tcontainer.MarshalMap
 }
 

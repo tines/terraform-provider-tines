@@ -13,9 +13,9 @@ provider "tines" {
   token    = var.tines_token
 }
 
-provider "aws" {
-  region    = "us-east-1"
-}
+# provider "aws" {
+#   region    = "us-east-1"
+# }
 
 
 resource "random_id" "webhook_secret" {
@@ -48,10 +48,10 @@ resource "tines_agent" "webhook_confirm" {
   })
 }
 
-resource "aws_sns_topic_subscription" "sns_target" {
-  depends_on = [tines_agent.webhook_confirm]
-  topic_arn = var.aws_topic_arn
-  protocol = "https"
-  endpoint = format("%s/webhook/%s/%s", var.tines_base_url, tines_agent.webhook.guid, random_id.webhook_secret.dec)
-  endpoint_auto_confirms = true
-}
+# resource "aws_sns_topic_subscription" "sns_target" {
+#   depends_on = [tines_agent.webhook_confirm]
+#   topic_arn = var.aws_topic_arn
+#   protocol = "https"
+#   endpoint = format("%s/webhook/%s/%s", var.tines_base_url, tines_agent.webhook.guid, random_id.webhook_secret.dec)
+#   endpoint_auto_confirms = true
+# }

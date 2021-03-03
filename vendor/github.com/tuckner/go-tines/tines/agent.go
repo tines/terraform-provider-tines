@@ -41,6 +41,7 @@ type Agent struct {
 	SourceIds          []int       `json:"source_ids" structs:"source_ids,omitempty"`
 	ReceiverIds        []int       `json:"receiver_ids" structs:"receiver_ids,omitempty"`
 	Type               string      `json:"type" structs:"type,omitempty"`
+	Position           interface{} `json:"position" structs:"position,omitempty"`
 	Unknowns           tcontainer.MarshalMap
 }
 

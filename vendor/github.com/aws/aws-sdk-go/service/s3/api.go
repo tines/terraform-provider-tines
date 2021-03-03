@@ -392,21 +392,19 @@ func (c *S3) CopyObjectRequest(input *CopyObjectInput) (req *request.Request, ou
 // All headers with the x-amz- prefix, including x-amz-copy-source, must be
 // signed.
 //
-// Encryption
+// Server-side encryption
 //
-// The source object that you are copying can be encrypted or unencrypted. The
-// source object can be encrypted with server-side encryption using AWS managed
-// encryption keys (SSE-S3 or SSE-KMS) or by using a customer-provided encryption
-// key. With server-side encryption, Amazon S3 encrypts your data as it writes
-// it to disks in its data centers and decrypts the data when you access it.
+// When you perform a CopyObject operation, you can optionally use the appropriate
+// encryption-related headers to encrypt the object using server-side encryption
+// with AWS managed encryption keys (SSE-S3 or SSE-KMS) or a customer-provided
+// encryption key. With server-side encryption, Amazon S3 encrypts your data
+// as it writes it to disks in its data centers and decrypts the data when you
+// access it. For more information about server-side encryption, see Using Server-Side
+// Encryption (https://docs.aws.amazon.com/AmazonS3/latest/dev/serv-side-encryption.html).
 //
-// You can optionally use the appropriate encryption-related headers to request
-// server-side encryption for the target object. You have the option to provide
-// your own encryption key or use SSE-S3 or SSE-KMS, regardless of the form
-// of server-side encryption that was used to encrypt the source object. You
-// can even request encryption if the source object was not encrypted. For more
-// information about server-side encryption, see Using Server-Side Encryption
-// (https://docs.aws.amazon.com/AmazonS3/latest/dev/serv-side-encryption.html).
+// If a target object uses SSE-KMS, you can enable an S3 Bucket Key for the
+// object. For more information, see Amazon S3 Bucket Keys (https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-key.html)
+// in the Amazon Simple Storage Service Developer Guide.
 //
 // Access Control List (ACL)-Specific Request Headers
 //
@@ -2854,9 +2852,12 @@ func (c *S3) GetBucketEncryptionRequest(input *GetBucketEncryptionInput) (req *r
 
 // GetBucketEncryption API operation for Amazon Simple Storage Service.
 //
-// Returns the default encryption configuration for an Amazon S3 bucket. For
-// information about the Amazon S3 default encryption feature, see Amazon S3
-// Default Bucket Encryption (https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html).
+// Returns the default encryption configuration for an Amazon S3 bucket. If
+// the bucket does not have a default encryption configuration, GetBucketEncryption
+// returns ServerSideEncryptionConfigurationNotFoundError.
+//
+// For information about the Amazon S3 default encryption feature, see Amazon
+// S3 Default Bucket Encryption (https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html).
 //
 // To use this operation, you must have permission to perform the s3:GetEncryptionConfiguration
 // action. The bucket owner has this permission by default. The bucket owner
@@ -5044,6 +5045,8 @@ func (c *S3) GetObjectTaggingRequest(input *GetObjectTaggingInput) (req *request
 //
 //    * PutObjectTagging (https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObjectTagging.html)
 //
+//    * DeleteObjectTagging (https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObjectTagging.html)
+//
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
 // the error.
@@ -5304,8 +5307,12 @@ func (c *S3) HeadBucketRequest(input *HeadBucketInput) (req *request.Request, ou
 //
 // This operation is useful to determine if a bucket exists and you have permission
 // to access it. The operation returns a 200 OK if the bucket exists and you
-// have permission to access it. Otherwise, the operation might return responses
-// such as 404 Not Found and 403 Forbidden.
+// have permission to access it.
+//
+// If the bucket does not exist or you do not have permission to access it,
+// the HEAD request returns a generic 404 Not Found or 403 Forbidden code. A
+// message body is not included, so you cannot determine the exception beyond
+// these error codes.
 //
 // To use this operation, you must have permissions to perform the s3:ListBucket
 // action. The bucket owner has this permission by default and can grant this
@@ -5396,7 +5403,9 @@ func (c *S3) HeadObjectRequest(input *HeadObjectInput) (req *request.Request, ou
 //
 // A HEAD request has the same options as a GET operation on an object. The
 // response is identical to the GET response except that there is no response
-// body.
+// body. Because of this, if the HEAD request generates an error, it returns
+// a generic 404 Not Found or 403 Forbidden code. It is not possible to retrieve
+// the exact exception beyond these error codes.
 //
 // If you encrypt an object by using server-side encryption with customer-provided
 // encryption keys (SSE-C) when you store the object in Amazon S3, then when
@@ -5411,11 +5420,14 @@ func (c *S3) HeadObjectRequest(input *HeadObjectInput) (req *request.Request, ou
 // For more information about SSE-C, see Server-Side Encryption (Using Customer-Provided
 // Encryption Keys) (https://docs.aws.amazon.com/AmazonS3/latest/dev/ServerSideEncryptionCustomerKeys.html).
 //
-// Encryption request headers, like x-amz-server-side-encryption, should not
-// be sent for GET requests if your object uses server-side encryption with
-// CMKs stored in AWS KMS (SSE-KMS) or server-side encryption with Amazon S3–managed
-// encryption keys (SSE-S3). If your object does use these types of keys, you’ll
-// get an HTTP 400 BadRequest error.
+//    * Encryption request headers, like x-amz-server-side-encryption, should
+//    not be sent for GET requests if your object uses server-side encryption
+//    with CMKs stored in AWS KMS (SSE-KMS) or server-side encryption with Amazon
+//    S3–managed encryption keys (SSE-S3). If your object does use these types
+//    of keys, you’ll get an HTTP 400 BadRequest error.
+//
+//    * The last modified property in this case is the creation date of the
+//    object.
 //
 // Request headers are limited to 8 KB in size. For more information, see Common
 // Request Headers (https://docs.aws.amazon.com/AmazonS3/latest/API/RESTCommonRequestHeaders.html).
@@ -6484,7 +6496,8 @@ func (c *S3) ListObjectsV2Request(input *ListObjectsV2Input) (req *request.Reque
 // the request parameters as selection criteria to return a subset of the objects
 // in a bucket. A 200 OK response can contain valid or invalid XML. Make sure
 // to design your application to parse the contents of the response and handle
-// it appropriately.
+// it appropriately. Objects are returned sorted in an ascending order of the
+// respective key names in the list.
 //
 // To use this operation, you must have READ access to the bucket.
 //
@@ -7316,13 +7329,17 @@ func (c *S3) PutBucketEncryptionRequest(input *PutBucketEncryptionInput) (req *r
 
 // PutBucketEncryption API operation for Amazon Simple Storage Service.
 //
-// This implementation of the PUT operation uses the encryption subresource
-// to set the default encryption state of an existing bucket.
+// This operation uses the encryption subresource to configure default encryption
+// and Amazon S3 Bucket Key for an existing bucket.
 //
-// This implementation of the PUT operation sets default encryption for a bucket
-// using server-side encryption with Amazon S3-managed keys SSE-S3 or AWS KMS
-// customer master keys (CMKs) (SSE-KMS). For information about the Amazon S3
-// default encryption feature, see Amazon S3 Default Bucket Encryption (https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html).
+// Default encryption for a bucket can use server-side encryption with Amazon
+// S3-managed keys (SSE-S3) or AWS KMS customer master keys (SSE-KMS). If you
+// specify default encryption using SSE-KMS, you can also configure Amazon S3
+// Bucket Key. For information about default encryption, see Amazon S3 default
+// bucket encryption (https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html)
+// in the Amazon Simple Storage Service Developer Guide. For more information
+// about S3 Bucket Keys, see Amazon S3 Bucket Keys (https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-key.html)
+// in the Amazon Simple Storage Service Developer Guide.
 //
 // This operation requires AWS Signature Version 4. For more information, see
 // Authenticating Requests (AWS Signature Version 4) (sig-v4-authenticating-requests.html).
@@ -7413,7 +7430,8 @@ func (c *S3) PutBucketIntelligentTieringConfigurationRequest(input *PutBucketInt
 
 // PutBucketIntelligentTieringConfiguration API operation for Amazon Simple Storage Service.
 //
-// Puts a S3 Intelligent-Tiering configuration to the specified bucket.
+// Puts a S3 Intelligent-Tiering configuration to the specified bucket. You
+// can have up to 1,000 S3 Intelligent-Tiering configurations per bucket.
 //
 // The S3 Intelligent-Tiering storage class is designed to optimize storage
 // costs by automatically moving data to the most cost-effective storage access
@@ -7439,6 +7457,22 @@ func (c *S3) PutBucketIntelligentTieringConfigurationRequest(input *PutBucketInt
 //    * GetBucketIntelligentTieringConfiguration (https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketIntelligentTieringConfiguration.html)
 //
 //    * ListBucketIntelligentTieringConfigurations (https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListBucketIntelligentTieringConfigurations.html)
+//
+// You only need S3 Intelligent-Tiering enabled on a bucket if you want to automatically
+// move objects stored in the S3 Intelligent-Tiering storage class to the Archive
+// Access or Deep Archive Access tier.
+//
+// Special Errors
+//
+//    * HTTP 400 Bad Request Error Code: InvalidArgument Cause: Invalid Argument
+//
+//    * HTTP 400 Bad Request Error Code: TooManyConfigurations Cause: You are
+//    attempting to create a new configuration but have already reached the
+//    1,000-configuration limit.
+//
+//    * HTTP 403 Forbidden Error Code: AccessDenied Cause: You are not the owner
+//    of the specified bucket, or you do not have the s3:PutIntelligentTieringConfiguration
+//    bucket permission to set the configuration on the bucket.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -8555,15 +8589,14 @@ func (c *S3) PutBucketReplicationRequest(input *PutBucketReplicationInput) (req 
 // permission.
 //
 // Specify the replication configuration in the request body. In the replication
-// configuration, you provide the name of the destination bucket where you want
-// Amazon S3 to replicate objects, the IAM role that Amazon S3 can assume to
-// replicate objects on your behalf, and other relevant information.
+// configuration, you provide the name of the destination bucket or buckets
+// where you want Amazon S3 to replicate objects, the IAM role that Amazon S3
+// can assume to replicate objects on your behalf, and other relevant information.
 //
 // A replication configuration must include at least one rule, and can contain
 // a maximum of 1,000. Each rule identifies a subset of objects to replicate
 // by filtering the objects in the source bucket. To choose additional subsets
-// of objects to replicate, add a rule for each subset. All rules must specify
-// the same destination bucket.
+// of objects to replicate, add a rule for each subset.
 //
 // To specify a subset of the objects in the source bucket to apply a replication
 // rule to, add the Filter element as a child of the Rule element. You can filter
@@ -9167,8 +9200,13 @@ func (c *S3) PutObjectRequest(input *PutObjectInput) (req *request.Request, outp
 // You can optionally request server-side encryption. With server-side encryption,
 // Amazon S3 encrypts your data as it writes it to disks in its data centers
 // and decrypts the data when you access it. You have the option to provide
-// your own encryption key or use AWS managed encryption keys. For more information,
-// see Using Server-Side Encryption (https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html).
+// your own encryption key or use AWS managed encryption keys (SSE-S3 or SSE-KMS).
+// For more information, see Using Server-Side Encryption (https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html).
+//
+// If you request server-side encryption using AWS Key Management Service (SSE-KMS),
+// you can enable an S3 Bucket Key at the object-level. For more information,
+// see Amazon S3 Bucket Keys (https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-key.html)
+// in the Amazon Simple Storage Service Developer Guide.
 //
 // Access Control List (ACL)-Specific Request Headers
 //
@@ -9744,6 +9782,8 @@ func (c *S3) PutObjectTaggingRequest(input *PutObjectTaggingInput) (req *request
 // Related Resources
 //
 //    * GetObjectTagging (https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObjectTagging.html)
+//
+//    * DeleteObjectTagging (https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObjectTagging.html)
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -11448,7 +11488,8 @@ func (s *AnalyticsS3BucketDestination) SetPrefix(v string) *AnalyticsS3BucketDes
 type Bucket struct {
 	_ struct{} `type:"structure"`
 
-	// Date the bucket was created.
+	// Date the bucket was created. This date can change when making changes to
+	// your bucket, such as editing its bucket policy.
 	CreationDate *time.Time `type:"timestamp"`
 
 	// The name of the bucket.
@@ -12136,6 +12177,10 @@ type CompleteMultipartUploadOutput struct {
 	// in the Amazon Simple Storage Service Developer Guide.
 	Bucket *string `type:"string"`
 
+	// Indicates whether the multipart upload uses an S3 Bucket Key for server-side
+	// encryption with AWS KMS (SSE-KMS).
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
+
 	// Entity tag that identifies the newly created object's data. Objects with
 	// different object data will have different entity tags. The entity tag is
 	// an opaque string. The entity tag may or may not be an MD5 digest of the object
@@ -12195,6 +12240,12 @@ func (s *CompleteMultipartUploadOutput) getBucket() (v string) {
 		return v
 	}
 	return *s.Bucket
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *CompleteMultipartUploadOutput) SetBucketKeyEnabled(v bool) *CompleteMultipartUploadOutput {
+	s.BucketKeyEnabled = &v
+	return s
 }
 
 // SetETag sets the ETag field's value.
@@ -12324,6 +12375,10 @@ type Condition struct {
 	// the parent element Condition is specified and sibling HttpErrorCodeReturnedEquals
 	// is not specified. If both conditions are specified, both must be true for
 	// the redirect to be applied.
+	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
 	KeyPrefixEquals *string `type:"string"`
 }
 
@@ -12409,6 +12464,15 @@ type CopyObjectInput struct {
 	//
 	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
+
+	// Specifies whether Amazon S3 should use an S3 Bucket Key for object encryption
+	// with server-side encryption using AWS KMS (SSE-KMS). Setting this header
+	// to true causes Amazon S3 to use an S3 Bucket Key for object encryption with
+	// SSE-KMS.
+	//
+	// Specifying this header with a COPY operation doesn’t affect bucket-level
+	// settings for S3 Bucket Key.
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
 
 	// Specifies caching behavior along the request/reply chain.
 	CacheControl *string `location:"header" locationName:"Cache-Control" type:"string"`
@@ -12656,6 +12720,12 @@ func (s *CopyObjectInput) getBucket() (v string) {
 		return v
 	}
 	return *s.Bucket
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *CopyObjectInput) SetBucketKeyEnabled(v bool) *CopyObjectInput {
+	s.BucketKeyEnabled = &v
+	return s
 }
 
 // SetCacheControl sets the CacheControl field's value.
@@ -12924,6 +12994,10 @@ func (s CopyObjectInput) updateArnableField(v string) (interface{}, error) {
 type CopyObjectOutput struct {
 	_ struct{} `type:"structure" payload:"CopyObjectResult"`
 
+	// Indicates whether the copied object uses an S3 Bucket Key for server-side
+	// encryption with AWS KMS (SSE-KMS).
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
+
 	// Container for all response elements.
 	CopyObjectResult *CopyObjectResult `type:"structure"`
 
@@ -12973,6 +13047,12 @@ func (s CopyObjectOutput) String() string {
 // GoString returns the string representation
 func (s CopyObjectOutput) GoString() string {
 	return s.String()
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *CopyObjectOutput) SetBucketKeyEnabled(v bool) *CopyObjectOutput {
+	s.BucketKeyEnabled = &v
+	return s
 }
 
 // SetCopyObjectResult sets the CopyObjectResult field's value.
@@ -13041,10 +13121,10 @@ type CopyObjectResult struct {
 
 	// Returns the ETag of the new object. The ETag reflects only changes to the
 	// contents of an object, not its metadata. The source and destination ETag
-	// is identical for a successfully copied object.
+	// is identical for a successfully copied non-multipart object.
 	ETag *string `type:"string"`
 
-	// Returns the date that the object was last modified.
+	// Creation date of the object.
 	LastModified *time.Time `type:"timestamp"`
 }
 
@@ -13302,6 +13382,15 @@ type CreateMultipartUploadInput struct {
 	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
+	// Specifies whether Amazon S3 should use an S3 Bucket Key for object encryption
+	// with server-side encryption using AWS KMS (SSE-KMS). Setting this header
+	// to true causes Amazon S3 to use an S3 Bucket Key for object encryption with
+	// SSE-KMS.
+	//
+	// Specifying this header with an object operation doesn’t affect bucket-level
+	// settings for S3 Bucket Key.
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
+
 	// Specifies caching behavior along the request/reply chain.
 	CacheControl *string `location:"header" locationName:"Cache-Control" type:"string"`
 
@@ -13470,6 +13559,12 @@ func (s *CreateMultipartUploadInput) getBucket() (v string) {
 		return v
 	}
 	return *s.Bucket
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *CreateMultipartUploadInput) SetBucketKeyEnabled(v bool) *CreateMultipartUploadInput {
+	s.BucketKeyEnabled = &v
+	return s
 }
 
 // SetCacheControl sets the CacheControl field's value.
@@ -13699,6 +13794,10 @@ type CreateMultipartUploadOutput struct {
 	// in the Amazon Simple Storage Service Developer Guide.
 	Bucket *string `locationName:"Bucket" type:"string"`
 
+	// Indicates whether the multipart upload uses an S3 Bucket Key for server-side
+	// encryption with AWS KMS (SSE-KMS).
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
+
 	// Object key for which the multipart upload was initiated.
 	Key *string `min:"1" type:"string"`
 
@@ -13767,6 +13866,12 @@ func (s *CreateMultipartUploadOutput) getBucket() (v string) {
 		return v
 	}
 	return *s.Bucket
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *CreateMultipartUploadOutput) SetBucketKeyEnabled(v bool) *CreateMultipartUploadOutput {
+	s.BucketKeyEnabled = &v
+	return s
 }
 
 // SetKey sets the Key field's value.
@@ -15600,7 +15705,8 @@ type DeleteObjectTaggingInput struct {
 	// error.
 	ExpectedBucketOwner *string `location:"header" locationName:"x-amz-expected-bucket-owner" type:"string"`
 
-	// Name of the object key.
+	// The key that identifies the object in the bucket from which to remove all
+	// tags.
 	//
 	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
@@ -16753,6 +16859,10 @@ type ErrorDocument struct {
 	_ struct{} `type:"structure"`
 
 	// The object key name to use when a 4XX class error occurs.
+	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
 	//
 	// Key is a required field
 	Key *string `min:"1" type:"string" required:"true"`
@@ -19496,16 +19606,16 @@ type GetObjectInput struct {
 	ResponseContentType *string `location:"querystring" locationName:"response-content-type" type:"string"`
 
 	// Sets the Expires header of the response.
-	ResponseExpires *time.Time `location:"querystring" locationName:"response-expires" type:"timestamp"`
+	ResponseExpires *time.Time `location:"querystring" locationName:"response-expires" type:"timestamp" timestampFormat:"rfc822"`
 
-	// Specifies the algorithm to use to when encrypting the object (for example,
+	// Specifies the algorithm to use to when decrypting the object (for example,
 	// AES256).
 	SSECustomerAlgorithm *string `location:"header" locationName:"x-amz-server-side-encryption-customer-algorithm" type:"string"`
 
-	// Specifies the customer-provided encryption key for Amazon S3 to use in encrypting
-	// data. This value is used to store the object and then it is discarded; Amazon
-	// S3 does not store the encryption key. The key must be appropriate for use
-	// with the algorithm specified in the x-amz-server-side-encryption-customer-algorithm
+	// Specifies the customer-provided encryption key for Amazon S3 used to encrypt
+	// the data. This value is used to decrypt the object when recovering it and
+	// must match the one used when storing the data. The key must be appropriate
+	// for use with the algorithm specified in the x-amz-server-side-encryption-customer-algorithm
 	// header.
 	SSECustomerKey *string `marshal-as:"blob" location:"header" locationName:"x-amz-server-side-encryption-customer-key" type:"string" sensitive:"true"`
 
@@ -19992,6 +20102,10 @@ type GetObjectOutput struct {
 	// Object data.
 	Body io.ReadCloser `type:"blob"`
 
+	// Indicates whether the object uses an S3 Bucket Key for server-side encryption
+	// with AWS KMS (SSE-KMS).
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
+
 	// Specifies caching behavior along the request/reply chain.
 	CacheControl *string `location:"header" locationName:"Cache-Control" type:"string"`
 
@@ -20032,7 +20146,7 @@ type GetObjectOutput struct {
 	// The date and time at which the object is no longer cacheable.
 	Expires *string `location:"header" locationName:"Expires" type:"string"`
 
-	// Last modified date of the object
+	// Creation date of the object.
 	LastModified *time.Time `location:"header" locationName:"Last-Modified" type:"timestamp"`
 
 	// A map of metadata to store with the object in S3.
@@ -20127,6 +20241,12 @@ func (s *GetObjectOutput) SetAcceptRanges(v string) *GetObjectOutput {
 // SetBody sets the Body field's value.
 func (s *GetObjectOutput) SetBody(v io.ReadCloser) *GetObjectOutput {
 	s.Body = v
+	return s
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *GetObjectOutput) SetBucketKeyEnabled(v bool) *GetObjectOutput {
+	s.BucketKeyEnabled = &v
 	return s
 }
 
@@ -20493,6 +20613,13 @@ type GetObjectTaggingInput struct {
 	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
+	// Confirms that the requester knows that they will be charged for the request.
+	// Bucket owners need not specify this parameter in their requests. For information
+	// about downloading objects from requester pays buckets, see Downloading Objects
+	// in Requestor Pays Buckets (https://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html)
+	// in the Amazon S3 Developer Guide.
+	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
+
 	// The versionId of the object for which to get the tagging information.
 	VersionId *string `location:"querystring" locationName:"versionId" type:"string"`
 }
@@ -20551,6 +20678,12 @@ func (s *GetObjectTaggingInput) SetExpectedBucketOwner(v string) *GetObjectTaggi
 // SetKey sets the Key field's value.
 func (s *GetObjectTaggingInput) SetKey(v string) *GetObjectTaggingInput {
 	s.Key = &v
+	return s
+}
+
+// SetRequestPayer sets the RequestPayer field's value.
+func (s *GetObjectTaggingInput) SetRequestPayer(v string) *GetObjectTaggingInput {
+	s.RequestPayer = &v
 	return s
 }
 
@@ -21437,6 +21570,10 @@ type HeadObjectOutput struct {
 	// The archive state of the head object.
 	ArchiveStatus *string `location:"header" locationName:"x-amz-archive-status" type:"string" enum:"ArchiveStatus"`
 
+	// Indicates whether the object uses an S3 Bucket Key for server-side encryption
+	// with AWS KMS (SSE-KMS).
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
+
 	// Specifies caching behavior along the request/reply chain.
 	CacheControl *string `location:"header" locationName:"Cache-Control" type:"string"`
 
@@ -21474,7 +21611,7 @@ type HeadObjectOutput struct {
 	// The date and time at which the object is no longer cacheable.
 	Expires *string `location:"header" locationName:"Expires" type:"string"`
 
-	// Last modified date of the object
+	// Creation date of the object.
 	LastModified *time.Time `location:"header" locationName:"Last-Modified" type:"timestamp"`
 
 	// A map of metadata to store with the object in S3.
@@ -21510,13 +21647,13 @@ type HeadObjectOutput struct {
 	PartsCount *int64 `location:"header" locationName:"x-amz-mp-parts-count" type:"integer"`
 
 	// Amazon S3 can return this header if your request involves a bucket that is
-	// either a source or destination in a replication rule.
+	// either a source or a destination in a replication rule.
 	//
 	// In replication, you have a source bucket on which you configure replication
-	// and destination bucket where Amazon S3 stores object replicas. When you request
-	// an object (GetObject) or object metadata (HeadObject) from these buckets,
-	// Amazon S3 will return the x-amz-replication-status header in the response
-	// as follows:
+	// and destination bucket or buckets where Amazon S3 stores object replicas.
+	// When you request an object (GetObject) or object metadata (HeadObject) from
+	// these buckets, Amazon S3 will return the x-amz-replication-status header
+	// in the response as follows:
 	//
 	//    * If requesting an object from the source bucket — Amazon S3 will return
 	//    the x-amz-replication-status header if the object in your request is eligible
@@ -21528,9 +21665,17 @@ type HeadObjectOutput struct {
 	//    header with value PENDING, COMPLETED or FAILED indicating object replication
 	//    status.
 	//
-	//    * If requesting an object from the destination bucket — Amazon S3 will
+	//    * If requesting an object from a destination bucket — Amazon S3 will
 	//    return the x-amz-replication-status header with value REPLICA if the object
-	//    in your request is a replica that Amazon S3 created.
+	//    in your request is a replica that Amazon S3 created and there is no replica
+	//    modification replication in progress.
+	//
+	//    * When replicating objects to multiple destination buckets the x-amz-replication-status
+	//    header acts differently. The header of the source object will only return
+	//    a value of COMPLETED when replication is successful to all destinations.
+	//    The header will remain at value PENDING until replication has completed
+	//    for all destinations. If one or more destinations fails replication the
+	//    header will return FAILED.
 	//
 	// For more information, see Replication (https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html).
 	ReplicationStatus *string `location:"header" locationName:"x-amz-replication-status" type:"string" enum:"ReplicationStatus"`
@@ -21611,6 +21756,12 @@ func (s *HeadObjectOutput) SetAcceptRanges(v string) *HeadObjectOutput {
 // SetArchiveStatus sets the ArchiveStatus field's value.
 func (s *HeadObjectOutput) SetArchiveStatus(v string) *HeadObjectOutput {
 	s.ArchiveStatus = &v
+	return s
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *HeadObjectOutput) SetBucketKeyEnabled(v bool) *HeadObjectOutput {
+	s.BucketKeyEnabled = &v
 	return s
 }
 
@@ -21785,6 +21936,10 @@ type IndexDocument struct {
 	// to samplebucket/images/ the data that is returned will be for the object
 	// with the key name images/index.html) The suffix must not be empty and must
 	// not include a slash character.
+	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
 	//
 	// Suffix is a required field
 	Suffix *string `type:"string" required:"true"`
@@ -22069,6 +22224,10 @@ type IntelligentTieringFilter struct {
 
 	// An object key name prefix that identifies the subset of objects to which
 	// the rule applies.
+	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
 	Prefix *string `type:"string"`
 
 	// A container of a key value name pair.
@@ -22816,6 +22975,10 @@ type LifecycleRule struct {
 	// Prefix identifying one or more objects to which the rule applies. This is
 	// No longer used; use Filter instead.
 	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
+	//
 	// Deprecated: Prefix has been deprecated
 	Prefix *string `deprecated:"true" type:"string"`
 
@@ -22978,6 +23141,10 @@ type LifecycleRuleFilter struct {
 	And *LifecycleRuleAndOperator `type:"structure"`
 
 	// Prefix identifying one or more objects to which the rule applies.
+	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
 	Prefix *string `type:"string"`
 
 	// This tag must exist in the object's tag set in order for the rule to apply.
@@ -24484,8 +24651,8 @@ func (s ListObjectsInput) updateArnableField(v string) (interface{}, error) {
 type ListObjectsOutput struct {
 	_ struct{} `type:"structure"`
 
-	// All of the keys rolled up in a common prefix count as a single return when
-	// calculating the number of returns.
+	// All of the keys (up to 1,000) rolled up in a common prefix count as a single
+	// return when calculating the number of returns.
 	//
 	// A response can contain CommonPrefixes only if you specify a delimiter.
 	//
@@ -24796,8 +24963,8 @@ func (s ListObjectsV2Input) updateArnableField(v string) (interface{}, error) {
 type ListObjectsV2Output struct {
 	_ struct{} `type:"structure"`
 
-	// All of the keys rolled up into a common prefix count as a single return when
-	// calculating the number of returns.
+	// All of the keys (up to 1,000) rolled up into a common prefix count as a single
+	// return when calculating the number of returns.
 	//
 	// A response can contain CommonPrefixes only if you specify a delimiter.
 	//
@@ -24841,8 +25008,8 @@ type ListObjectsV2Output struct {
 	IsTruncated *bool `type:"boolean"`
 
 	// KeyCount is the number of keys returned with this request. KeyCount will
-	// always be less than equals to MaxKeys field. Say you ask for 50 keys, your
-	// result will include less than equals 50 keys
+	// always be less than or equals to MaxKeys field. Say you ask for 50 keys,
+	// your result will include less than equals 50 keys
 	KeyCount *int64 `type:"integer"`
 
 	// Sets the maximum number of keys returned in the response. By default the
@@ -26100,7 +26267,7 @@ type Object struct {
 	// the object.
 	Key *string `min:"1" type:"string"`
 
-	// The date the Object was Last Modified
+	// Creation date of the object.
 	LastModified *time.Time `type:"timestamp"`
 
 	// The owner of the object
@@ -26163,7 +26330,11 @@ func (s *Object) SetStorageClass(v string) *Object {
 type ObjectIdentifier struct {
 	_ struct{} `type:"structure"`
 
-	// Key name of the object to delete.
+	// Key name of the object.
+	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
 	//
 	// Key is a required field
 	Key *string `min:"1" type:"string" required:"true"`
@@ -29647,6 +29818,15 @@ type PutObjectInput struct {
 	// Bucket is a required field
 	Bucket *string `location:"uri" locationName:"Bucket" type:"string" required:"true"`
 
+	// Specifies whether Amazon S3 should use an S3 Bucket Key for object encryption
+	// with server-side encryption using AWS KMS (SSE-KMS). Setting this header
+	// to true causes Amazon S3 to use an S3 Bucket Key for object encryption with
+	// SSE-KMS.
+	//
+	// Specifying this header with a PUT operation doesn’t affect bucket-level
+	// settings for S3 Bucket Key.
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
+
 	// Can be used to specify caching behavior along the request/reply chain. For
 	// more information, see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 	// (http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9).
@@ -29861,6 +30041,12 @@ func (s *PutObjectInput) getBucket() (v string) {
 		return v
 	}
 	return *s.Bucket
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *PutObjectInput) SetBucketKeyEnabled(v bool) *PutObjectInput {
+	s.BucketKeyEnabled = &v
+	return s
 }
 
 // SetCacheControl sets the CacheControl field's value.
@@ -30376,6 +30562,10 @@ func (s *PutObjectLockConfigurationOutput) SetRequestCharged(v string) *PutObjec
 type PutObjectOutput struct {
 	_ struct{} `type:"structure"`
 
+	// Indicates whether the uploaded object uses an S3 Bucket Key for server-side
+	// encryption with AWS KMS (SSE-KMS).
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
+
 	// Entity tag for the uploaded object.
 	ETag *string `location:"header" locationName:"ETag" type:"string"`
 
@@ -30429,6 +30619,12 @@ func (s PutObjectOutput) String() string {
 // GoString returns the string representation
 func (s PutObjectOutput) GoString() string {
 	return s.String()
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *PutObjectOutput) SetBucketKeyEnabled(v bool) *PutObjectOutput {
+	s.BucketKeyEnabled = &v
+	return s
 }
 
 // SetETag sets the ETag field's value.
@@ -30695,6 +30891,13 @@ type PutObjectTaggingInput struct {
 	// Key is a required field
 	Key *string `location:"uri" locationName:"Key" min:"1" type:"string" required:"true"`
 
+	// Confirms that the requester knows that they will be charged for the request.
+	// Bucket owners need not specify this parameter in their requests. For information
+	// about downloading objects from requester pays buckets, see Downloading Objects
+	// in Requestor Pays Buckets (https://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html)
+	// in the Amazon S3 Developer Guide.
+	RequestPayer *string `location:"header" locationName:"x-amz-request-payer" type:"string" enum:"RequestPayer"`
+
 	// Container for the TagSet and Tag elements
 	//
 	// Tagging is a required field
@@ -30766,6 +30969,12 @@ func (s *PutObjectTaggingInput) SetExpectedBucketOwner(v string) *PutObjectTaggi
 // SetKey sets the Key field's value.
 func (s *PutObjectTaggingInput) SetKey(v string) *PutObjectTaggingInput {
 	s.Key = &v
+	return s
+}
+
+// SetRequestPayer sets the RequestPayer field's value.
+func (s *PutObjectTaggingInput) SetRequestPayer(v string) *PutObjectTaggingInput {
+	s.RequestPayer = &v
 	return s
 }
 
@@ -31155,11 +31364,19 @@ type Redirect struct {
 	// and in the Redirect set ReplaceKeyPrefixWith to /documents. Not required
 	// if one of the siblings is present. Can be present only if ReplaceKeyWith
 	// is not provided.
+	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
 	ReplaceKeyPrefixWith *string `type:"string"`
 
 	// The specific object key to use in the redirect request. For example, redirect
 	// request to error.html. Not required if one of the siblings is present. Can
 	// be present only if ReplaceKeyPrefixWith is not provided.
+	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
 	ReplaceKeyWith *string `type:"string"`
 }
 
@@ -31250,6 +31467,53 @@ func (s *RedirectAllRequestsTo) SetHostName(v string) *RedirectAllRequestsTo {
 // SetProtocol sets the Protocol field's value.
 func (s *RedirectAllRequestsTo) SetProtocol(v string) *RedirectAllRequestsTo {
 	s.Protocol = &v
+	return s
+}
+
+// A filter that you can specify for selection for modifications on replicas.
+// Amazon S3 doesn't replicate replica modifications by default. In the latest
+// version of replication configuration (when Filter is specified), you can
+// specify this element and set the status to Enabled to replicate modifications
+// on replicas.
+//
+// If you don't specify the Filter element, Amazon S3 assumes that the replication
+// configuration is the earlier version, V1. In the earlier version, this element
+// is not allowed.
+type ReplicaModifications struct {
+	_ struct{} `type:"structure"`
+
+	// Specifies whether Amazon S3 replicates modifications on replicas.
+	//
+	// Status is a required field
+	Status *string `type:"string" required:"true" enum:"ReplicaModificationsStatus"`
+}
+
+// String returns the string representation
+func (s ReplicaModifications) String() string {
+	return awsutil.Prettify(s)
+}
+
+// GoString returns the string representation
+func (s ReplicaModifications) GoString() string {
+	return s.String()
+}
+
+// Validate inspects the fields of the type to determine if they are valid.
+func (s *ReplicaModifications) Validate() error {
+	invalidParams := request.ErrInvalidParams{Context: "ReplicaModifications"}
+	if s.Status == nil {
+		invalidParams.Add(request.NewErrParamRequired("Status"))
+	}
+
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	}
+	return nil
+}
+
+// SetStatus sets the Status field's value.
+func (s *ReplicaModifications) SetStatus(v string) *ReplicaModifications {
+	s.Status = &v
 	return s
 }
 
@@ -31362,19 +31626,18 @@ type ReplicationRule struct {
 	// the rule applies. The maximum prefix length is 1,024 characters. To include
 	// all objects in a bucket, specify an empty string.
 	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
+	//
 	// Deprecated: Prefix has been deprecated
 	Prefix *string `deprecated:"true" type:"string"`
 
-	// The priority associated with the rule. If you specify multiple rules in a
-	// replication configuration, Amazon S3 prioritizes the rules to prevent conflicts
-	// when filtering. If two or more rules identify the same object based on a
-	// specified filter, the rule with higher priority takes precedence. For example:
-	//
-	//    * Same object quality prefix-based filter criteria if prefixes you specified
-	//    in multiple rules overlap
-	//
-	//    * Same object qualify tag-based filter criteria specified in multiple
-	//    rules
+	// The priority indicates which rule has precedence whenever two or more replication
+	// rules conflict. Amazon S3 will attempt to replicate objects according to
+	// all replication rules. However, if there are two or more rules with the same
+	// destination bucket, then objects will be replicated according to the rule
+	// with the highest priority. The higher the number, the higher the priority.
 	//
 	// For more information, see Replication (https://docs.aws.amazon.com/AmazonS3/latest/dev/replication.html)
 	// in the Amazon Simple Storage Service Developer Guide.
@@ -31575,6 +31838,10 @@ type ReplicationRuleFilter struct {
 
 	// An object key name prefix that identifies the subset of objects to which
 	// the rule applies.
+	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
 	Prefix *string `type:"string"`
 
 	// A container for specifying a tag key and value.
@@ -32169,6 +32436,10 @@ type Rule struct {
 
 	// Object key prefix that identifies one or more objects to which this rule
 	// applies.
+	//
+	// Replacement must be made for object keys containing special characters (such
+	// as carriage returns) when using XML requests. For more information, see XML
+	// related object key constraints (https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints).
 	//
 	// Prefix is a required field
 	Prefix *string `type:"string" required:"true"`
@@ -32999,6 +33270,15 @@ type ServerSideEncryptionRule struct {
 	// bucket. If a PUT Object request doesn't specify any server-side encryption,
 	// this default encryption will be applied.
 	ApplyServerSideEncryptionByDefault *ServerSideEncryptionByDefault `type:"structure"`
+
+	// Specifies whether Amazon S3 should use an S3 Bucket Key with server-side
+	// encryption using KMS (SSE-KMS) for new objects in the bucket. Existing objects
+	// are not affected. Setting the BucketKeyEnabled element to true causes Amazon
+	// S3 to use an S3 Bucket Key. By default, S3 Bucket Key is not enabled.
+	//
+	// For more information, see Amazon S3 Bucket Keys (https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-key.html)
+	// in the Amazon Simple Storage Service Developer Guide.
+	BucketKeyEnabled *bool `type:"boolean"`
 }
 
 // String returns the string representation
@@ -33032,6 +33312,12 @@ func (s *ServerSideEncryptionRule) SetApplyServerSideEncryptionByDefault(v *Serv
 	return s
 }
 
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *ServerSideEncryptionRule) SetBucketKeyEnabled(v bool) *ServerSideEncryptionRule {
+	s.BucketKeyEnabled = &v
+	return s
+}
+
 // A container that describes additional filters for identifying the source
 // objects that you want to replicate. You can choose to enable or disable the
 // replication of these objects. Currently, Amazon S3 supports only the filter
@@ -33039,6 +33325,17 @@ func (s *ServerSideEncryptionRule) SetApplyServerSideEncryptionByDefault(v *Serv
 // a customer master key (CMK) stored in AWS Key Management Service (SSE-KMS).
 type SourceSelectionCriteria struct {
 	_ struct{} `type:"structure"`
+
+	// A filter that you can specify for selections for modifications on replicas.
+	// Amazon S3 doesn't replicate replica modifications by default. In the latest
+	// version of replication configuration (when Filter is specified), you can
+	// specify this element and set the status to Enabled to replicate modifications
+	// on replicas.
+	//
+	// If you don't specify the Filter element, Amazon S3 assumes that the replication
+	// configuration is the earlier version, V1. In the earlier version, this element
+	// is not allowed
+	ReplicaModifications *ReplicaModifications `type:"structure"`
 
 	// A container for filter information for the selection of Amazon S3 objects
 	// encrypted with AWS KMS. If you include SourceSelectionCriteria in the replication
@@ -33059,6 +33356,11 @@ func (s SourceSelectionCriteria) GoString() string {
 // Validate inspects the fields of the type to determine if they are valid.
 func (s *SourceSelectionCriteria) Validate() error {
 	invalidParams := request.ErrInvalidParams{Context: "SourceSelectionCriteria"}
+	if s.ReplicaModifications != nil {
+		if err := s.ReplicaModifications.Validate(); err != nil {
+			invalidParams.AddNested("ReplicaModifications", err.(request.ErrInvalidParams))
+		}
+	}
 	if s.SseKmsEncryptedObjects != nil {
 		if err := s.SseKmsEncryptedObjects.Validate(); err != nil {
 			invalidParams.AddNested("SseKmsEncryptedObjects", err.(request.ErrInvalidParams))
@@ -33069,6 +33371,12 @@ func (s *SourceSelectionCriteria) Validate() error {
 		return invalidParams
 	}
 	return nil
+}
+
+// SetReplicaModifications sets the ReplicaModifications field's value.
+func (s *SourceSelectionCriteria) SetReplicaModifications(v *ReplicaModifications) *SourceSelectionCriteria {
+	s.ReplicaModifications = v
+	return s
 }
 
 // SetSseKmsEncryptedObjects sets the SseKmsEncryptedObjects field's value.
@@ -34059,6 +34367,10 @@ func (s UploadPartCopyInput) updateArnableField(v string) (interface{}, error) {
 type UploadPartCopyOutput struct {
 	_ struct{} `type:"structure" payload:"CopyPartResult"`
 
+	// Indicates whether the multipart upload uses an S3 Bucket Key for server-side
+	// encryption with AWS KMS (SSE-KMS).
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
+
 	// Container for all response elements.
 	CopyPartResult *CopyPartResult `type:"structure"`
 
@@ -34098,6 +34410,12 @@ func (s UploadPartCopyOutput) String() string {
 // GoString returns the string representation
 func (s UploadPartCopyOutput) GoString() string {
 	return s.String()
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *UploadPartCopyOutput) SetBucketKeyEnabled(v bool) *UploadPartCopyOutput {
+	s.BucketKeyEnabled = &v
+	return s
 }
 
 // SetCopyPartResult sets the CopyPartResult field's value.
@@ -34377,6 +34695,10 @@ func (s UploadPartInput) updateArnableField(v string) (interface{}, error) {
 type UploadPartOutput struct {
 	_ struct{} `type:"structure"`
 
+	// Indicates whether the multipart upload uses an S3 Bucket Key for server-side
+	// encryption with AWS KMS (SSE-KMS).
+	BucketKeyEnabled *bool `location:"header" locationName:"x-amz-server-side-encryption-bucket-key-enabled" type:"boolean"`
+
 	// Entity tag for the uploaded object.
 	ETag *string `location:"header" locationName:"ETag" type:"string"`
 
@@ -34411,6 +34733,12 @@ func (s UploadPartOutput) String() string {
 // GoString returns the string representation
 func (s UploadPartOutput) GoString() string {
 	return s.String()
+}
+
+// SetBucketKeyEnabled sets the BucketKeyEnabled field's value.
+func (s *UploadPartOutput) SetBucketKeyEnabled(v bool) *UploadPartOutput {
+	s.BucketKeyEnabled = &v
+	return s
 }
 
 // SetETag sets the ETag field's value.
@@ -35470,6 +35798,22 @@ func QuoteFields_Values() []string {
 	return []string{
 		QuoteFieldsAlways,
 		QuoteFieldsAsneeded,
+	}
+}
+
+const (
+	// ReplicaModificationsStatusEnabled is a ReplicaModificationsStatus enum value
+	ReplicaModificationsStatusEnabled = "Enabled"
+
+	// ReplicaModificationsStatusDisabled is a ReplicaModificationsStatus enum value
+	ReplicaModificationsStatusDisabled = "Disabled"
+)
+
+// ReplicaModificationsStatus_Values returns all elements of the ReplicaModificationsStatus enum
+func ReplicaModificationsStatus_Values() []string {
+	return []string{
+		ReplicaModificationsStatusEnabled,
+		ReplicaModificationsStatusDisabled,
 	}
 }
 

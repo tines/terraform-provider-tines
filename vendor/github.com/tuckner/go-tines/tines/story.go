@@ -147,45 +147,45 @@ func (s *StoryService) Get(storyID int) (*Story, *Response, error) {
 // }
 
 // // CreateWithContext creates a story.
-// func (s *StoryService) CreateWithContext(ctx context.Context, story *Story) (*Story, *Response, error) {
-// 	apiEndpoint := fmt.Sprintf("stories")
-// 	req, err := s.client.NewRequestWithContext(ctx, "POST", apiEndpoint, story)
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
+func (s *StoryService) CreateWithContext(ctx context.Context, story *Story) (*Story, *Response, error) {
+	apiEndpoint := fmt.Sprintf("stories")
+	req, err := s.client.NewRequestWithContext(ctx, "POST", apiEndpoint, story)
+	if err != nil {
+		return nil, nil, err
+	}
 
-// 	storyresp := new(Story)
-// 	resp, err := s.client.Do(req, storyresp)
-// 	if err != nil {
-// 		return nil, resp, err
-// 	}
+	storyresp := new(Story)
+	resp, err := s.client.Do(req, storyresp)
+	if err != nil {
+		return nil, resp, err
+	}
 
-// 	return storyresp, resp, err
-// }
+	return storyresp, resp, err
+}
 
-// // Create wraps CreateWithContext using the background context.
-// func (s *StoryService) Create(story *Story) (*Story, *Response, error) {
-// 	return s.CreateWithContext(context.Background(), story)
-// }
+// Create wraps CreateWithContext using the background context.
+func (s *StoryService) Create(story *Story) (*Story, *Response, error) {
+	return s.CreateWithContext(context.Background(), story)
+}
 
-// // UpdateWithContext Updates a global resource.
-// func (s *StoryService) UpdateWithContext(ctx context.Context, storyID int, story *Story) (*Story, *Response, error) {
-// 	apiEndpoint := fmt.Sprintf("stories/%v", storyID)
-// 	req, err := s.client.NewRequestWithContext(ctx, "PUT", apiEndpoint, story)
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
+// UpdateWithContext Updates a story.
+func (s *StoryService) UpdateWithContext(ctx context.Context, storyID int, story *Story) (*Story, *Response, error) {
+	apiEndpoint := fmt.Sprintf("stories/%v", storyID)
+	req, err := s.client.NewRequestWithContext(ctx, "PUT", apiEndpoint, story)
+	if err != nil {
+		return nil, nil, err
+	}
 
-// 	storyresp := new(Story)
-// 	resp, err := s.client.Do(req, storyresp)
-// 	if err != nil {
-// 		return nil, resp, err
-// 	}
+	storyresp := new(Story)
+	resp, err := s.client.Do(req, storyresp)
+	if err != nil {
+		return nil, resp, err
+	}
 
-// 	return storyresp, resp, err
-// }
+	return storyresp, resp, err
+}
 
-// // Update wraps UpdateWithContext using the background context.
-// func (s *StoryService) Update(storyID int, story *Story) (*Story, *Response, error) {
-// 	return s.UpdateWithContext(context.Background(), storyID, story)
-// }
+// Update wraps UpdateWithContext using the background context.
+func (s *StoryService) Update(storyID int, story *Story) (*Story, *Response, error) {
+	return s.UpdateWithContext(context.Background(), storyID, story)
+}

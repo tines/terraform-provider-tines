@@ -36,6 +36,7 @@ func Provider() terraform.ResourceProvider {
 			"tines_agent_base":      resourceTinesAgentBase(),
 			"tines_agent_modify":    resourceTinesAgentModify(),
 			"tines_note":            resourceTinesNote(),
+			"tines_story":	         resourceTinesStory(),
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{

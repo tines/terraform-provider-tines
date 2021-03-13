@@ -48,10 +48,6 @@ func dataSourceTinesStory() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"diagram_layout": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"disabled": {
 				Type:     schema.TypeBool,
 				Optional: true,

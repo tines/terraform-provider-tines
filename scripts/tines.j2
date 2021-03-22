@@ -44,7 +44,9 @@ resource "tines_agent" "{{ agent.terraform_name  }}" {
 {% endfor %}{% for note in data.diagram_notes %}
 resource "tines_note" "note_{{ loop.index0 }}" {
     story_id = tines_story.{{ data.terraform_name }}.id
-    content = "{{ note.content }}"
+    content = <<EOF
+{{ note.content }}
+EOF
     position = {
       x = {{ note.position[0] }}
       y = {{ note.position[1] }}

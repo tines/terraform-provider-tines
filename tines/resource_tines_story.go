@@ -17,11 +17,11 @@ func resourceTinesStory() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"story_id": {
 				Type:     schema.TypeInt,
-				Optional: true,
+				Computed: true,
 			},
 			"user_id": {
 				Type:     schema.TypeInt,
-				Optional: true,
+				Computed: true,
 			},
 			"name": {
 				Type:     schema.TypeString,
@@ -88,12 +88,12 @@ func resourceTinesStoryCreate(d *schema.ResourceData, meta interface{}) error {
 	priority := d.Get("priority").(bool)
 
 	s := tines.Story{
-		Name:  name,
-		Description:  description,
+		Name:          name,
+		Description:   description,
 		KeepEventsFor: keepEventsFor,
-		TeamID: teamID,
-		Disabled: disabled,
-		Priority: priority,
+		TeamID:        teamID,
+		Disabled:      disabled,
+		Priority:      priority,
 	}
 
 	story, _, err := tinesClient.Story.Create(&s)
@@ -156,12 +156,12 @@ func resourceTinesStoryUpdate(d *schema.ResourceData, meta interface{}) error {
 	sid, _ := strconv.ParseInt(d.Id(), 10, 32)
 
 	s := tines.Story{
-		Name:  name,
-		Description:  description,
+		Name:          name,
+		Description:   description,
 		KeepEventsFor: keepEventsFor,
-		TeamID: teamID,
-		Disabled: disabled,
-		Priority: priority,
+		TeamID:        teamID,
+		Disabled:      disabled,
+		Priority:      priority,
 	}
 
 	story, _, err := tinesClient.Story.Update(int(sid), &s)

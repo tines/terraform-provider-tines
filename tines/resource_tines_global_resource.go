@@ -31,6 +31,10 @@ func resourceTinesGlobalResource() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"folder_id": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 			"global_resource_id": {
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -45,6 +49,7 @@ func resourceTinesGlobalResourceCreate(d *schema.ResourceData, meta interface{})
 	valueType := d.Get("value_type").(string)
 	value := d.Get("value").(string)
 	teamID := d.Get("team_id").(int)
+	folderID := d.Get("folder_id").(int)
 
 	tinesClient := meta.(*tines.Client)
 
@@ -53,6 +58,7 @@ func resourceTinesGlobalResourceCreate(d *schema.ResourceData, meta interface{})
 		ValueType: valueType,
 		Value:     value,
 		TeamID:    teamID,
+		FolderID:  folderID,
 	}
 
 	globalresource, _, err := tinesClient.GlobalResource.Create(&gr)
@@ -84,6 +90,7 @@ func resourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("value", globalresource.Value)
 	d.Set("value_type", globalresource.ValueType)
 	d.Set("team_id", globalresource.TeamID)
+	d.Set("folder_id", globalresource.FolderID)
 	d.Set("global_resource_id", globalresource.ID)
 
 	return nil
@@ -110,6 +117,7 @@ func resourceTinesGlobalResourceUpdate(d *schema.ResourceData, meta interface{})
 	valueType := d.Get("value_type").(string)
 	value := d.Get("value").(string)
 	teamID := d.Get("team_id").(int)
+	folderID := d.Get("folder_id").(int)
 	grid, _ := strconv.ParseInt(d.Id(), 10, 32)
 
 	gr := tines.GlobalResource{
@@ -117,6 +125,7 @@ func resourceTinesGlobalResourceUpdate(d *schema.ResourceData, meta interface{})
 		ValueType: valueType,
 		Value:     value,
 		TeamID:    teamID,
+		FolderID:  folderID,
 	}
 
 	globalresource, _, err := tinesClient.GlobalResource.Update(int(grid), &gr)
@@ -130,6 +139,7 @@ func resourceTinesGlobalResourceUpdate(d *schema.ResourceData, meta interface{})
 	d.Set("name", globalresource.Name)
 	d.Set("value", globalresource.Value)
 	d.Set("value_type", globalresource.ValueType)
+	d.Set("folder_id", globalresource.FolderID)
 	d.Set("grid", globalresource.ID)
 
 	return resourceTinesGlobalResourceRead(d, meta)

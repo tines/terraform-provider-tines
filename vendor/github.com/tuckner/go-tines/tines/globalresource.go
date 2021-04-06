@@ -30,7 +30,7 @@ type GlobalResource struct {
 	UpdatedAt time.Time   `json:"updated_at" structs:"updated_at,omitempty"`
 	Slug      string      `json:"slug" structs:"slug,omitempty"`
 	TeamID    int         `json:"team_id" structs:"team_id,omitempty"`
-	FolderID  interface{} `json:"folder_id" structs:"folder_id,omitempty"`
+	FolderID  int `json:"folder_id" structs:"folder_id,omitempty"`
 	Unknowns  tcontainer.MarshalMap
 }
 

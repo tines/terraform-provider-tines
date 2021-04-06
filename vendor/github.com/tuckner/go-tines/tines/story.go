@@ -125,26 +125,26 @@ func (s *StoryService) Get(storyID int) (*Story, *Response, error) {
 	return s.GetWithContext(context.Background(), storyID)
 }
 
-// // StoryWithContext deletes a story.
-// func (s *StoryService) DeleteWithContext(ctx context.Context, storyID int) (*Response, error) {
-// 	apiEndpoint := fmt.Sprintf("stories/%v", storyID)
-// 	req, err := s.client.NewRequestWithContext(ctx, "DELETE", apiEndpoint, nil)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+// StoryWithContext deletes a story.
+func (s *StoryService) DeleteWithContext(ctx context.Context, storyID int) (*Response, error) {
+	apiEndpoint := fmt.Sprintf("stories/%v", storyID)
+	req, err := s.client.NewRequestWithContext(ctx, "DELETE", apiEndpoint, nil)
+	if err != nil {
+		return nil, err
+	}
 
-// 	resp, err := s.client.Do(req, nil)
-// 	if err != nil {
-// 		return resp, err
-// 	}
+	resp, err := s.client.Do(req, nil)
+	if err != nil {
+		return resp, err
+	}
 
-// 	return resp, nil
-// }
+	return resp, nil
+}
 
-// // Delete wraps DeleteWithContext using the background context.
-// func (s *StoryService) Delete(storyID int) (*Response, error) {
-// 	return s.DeleteWithContext(context.Background(), storyID)
-// }
+// Delete wraps DeleteWithContext using the background context.
+func (s *StoryService) Delete(storyID int) (*Response, error) {
+	return s.DeleteWithContext(context.Background(), storyID)
+}
 
 // // CreateWithContext creates a story.
 func (s *StoryService) CreateWithContext(ctx context.Context, story *Story) (*Story, *Response, error) {

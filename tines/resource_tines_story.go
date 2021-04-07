@@ -138,6 +138,12 @@ func resourceTinesStoryRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceTinesStoryDelete(d *schema.ResourceData, meta interface{}) error {
 
+	tinesClient := meta.(*tines.Client)
+	sid, _ := strconv.ParseInt(d.Id(), 10, 32)
+	_, err := tinesClient.Story.Delete(int(sid))
+	if err != nil {
+		return err
+	}
 	d.SetId("")
 
 	return nil

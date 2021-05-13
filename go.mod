@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go v1.37.22 // indirect
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
-	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
@@ -34,7 +34,7 @@ require (
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/spf13/afero v1.5.1 // indirect
 	github.com/trivago/tgo v1.0.7
-	github.com/tuckner/go-tines v0.0.0-20210512205109-c5cc07e404fa
+	github.com/tuckner/go-tines v0.0.0-20210513162830-3ac260b9c4fd
 	github.com/ulikunitz/xz v0.5.10 // indirect
 	github.com/vmihailenco/tagparser v0.1.2 // indirect
 	github.com/zclconf/go-cty-yaml v1.0.2 // indirect

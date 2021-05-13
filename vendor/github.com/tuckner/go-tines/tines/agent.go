@@ -36,6 +36,8 @@ type Agent struct {
 	LastEventAt        time.Time              `json:"last_event_at" structs:"last_event_at,omitempty"`
 	LastErrorLogAt     interface{}            `json:"last_error_log_at" structs:"last_error_log_at,omitempty"`
 	Disabled           bool                   `json:"disabled" structs:"disabled,omitempty"`
+	MonitorFailures    bool                   `json:"monitor_failures" structs:"monitor_failures,omitempty"`
+	MonitorAllEvents   bool                   `json:"monitor_all_events" structs:"monitor_all_events,omitempty"`
 	GUID               string                 `json:"guid" structs:"guid,omitempty"`
 	StoryID            int                    `json:"story_id" structs:"story_id"`
 	SourceIds          []int                  `json:"source_ids" structs:"source_ids,omitempty"`

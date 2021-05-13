@@ -1,6 +1,8 @@
 package tines
 
 import (
+	"encoding/json"
+	"log"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -107,9 +109,12 @@ func resourceTinesAgentCreate(d *schema.ResourceData, meta interface{}) error {
 		sourceID[i] = v.(int)
 	}
 
+	var optionContainer map[string]interface{}
+	json.Unmarshal([]byte(options), &optionContainer)
+
 	custom := tcontainer.NewMarshalMap()
-	custom["options"] = options
-	// log.Printf("[DEBUG] Options block: %v", custom)
+	custom["options"] = optionContainer
+	log.Printf("[DEBUG] Options block: %v", custom)
 
 	a := tines.Agent{
 		Name:          name,

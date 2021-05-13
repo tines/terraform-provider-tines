@@ -35,7 +35,7 @@ func Provider() terraform.ResourceProvider {
 			"tines_agent":           resourceTinesAgent(),
 			"tines_agent_base":      resourceTinesAgentBase(),
 			"tines_agent_modify":    resourceTinesAgentModify(),
-			"tines_note":            resourceTinesNote(),
+			"tines_annotation":      resourceTinesAnnotation(),
 			"tines_story":           resourceTinesStory(),
 			"tines_credential":      resourceTinesCredential(),
 		},
@@ -44,7 +44,7 @@ func Provider() terraform.ResourceProvider {
 			"tines_global_resource": dataSourceTinesGlobalResource(),
 			"tines_agent":           dataSourceTinesAgent(),
 			"tines_story":           dataSourceTinesStory(),
-			// "tines_note":            dataSourceTinesNote(),
+			// "tines_annotation":            dataSourceTinesAnnotation(),
 			// "tines_credential":            dataSourceTinesCredential(),
 
 		},

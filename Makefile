@@ -3,7 +3,7 @@ HOSTNAME=github.com
 NAMESPACE=tuckner
 NAME=tines
 BINARY=terraform-provider-${NAME}
-VERSION=0.0.14
+VERSION=0.0.16
 OS_ARCH=darwin_amd64
 
 default: install

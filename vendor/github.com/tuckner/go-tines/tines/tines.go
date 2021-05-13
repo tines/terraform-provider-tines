@@ -32,7 +32,7 @@ type Client struct {
 	Agent          *AgentService
 	GlobalResource *GlobalResourceService
 	Story          *StoryService
-	Note           *NoteService
+	Annotation     *AnnotationService
 	Credential     *CredentialService
 }
 
@@ -64,7 +64,7 @@ func NewClient(httpClient httpClient, baseURL string, userEmail string, userToke
 	c.Agent = &AgentService{client: c}
 	c.GlobalResource = &GlobalResourceService{client: c}
 	c.Story = &StoryService{client: c}
-	c.Note = &NoteService{client: c}
+	c.Annotation = &AnnotationService{client: c}
 	c.Credential = &CredentialService{client: c}
 
 	return c, nil
@@ -165,7 +165,11 @@ func CheckResponse(r *http.Response, req *http.Request) error {
 		return nil
 	}
 
-	err := fmt.Errorf("request failed. Please analyze the request body for more details. Status code: %d. Resp Body: %d. Req URL: %d", r.StatusCode, r.Body, req.URL)
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(r.Body)
+	body := buf.String()
+
+	err := fmt.Errorf("Request failed. Please analyze the request body for more details. Status code: %d. Resp Body: %v. Req URL: %v", r.StatusCode, body, req.URL)
 	return err
 }
 

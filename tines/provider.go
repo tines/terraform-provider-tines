@@ -38,6 +38,8 @@ func Provider() terraform.ResourceProvider {
 			"tines_annotation":      resourceTinesAnnotation(),
 			"tines_story":           resourceTinesStory(),
 			"tines_credential":      resourceTinesCredential(),
+			"tines_team":            resourceTinesTeam(),
+			"tines_folder":          resourceTinesFolder(),
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{

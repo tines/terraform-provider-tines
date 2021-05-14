@@ -23,10 +23,21 @@ make install
 Authentication parameters can be set as environment variables
 
 ```
-export TF_VAR_tines_email=example@email.com
-export TF_VAR_tines_token=token
-export TF_VAR_tines_base_url=https://dappled-horse-1234.tines.io/
+export TINES_EMAIL=example@email.com
+export TINES_TOKEN=token
+export TINES_URL=https://dappled-horse-1234.tines.io/
 ```
+
+Parameters can also be set in the provider configuration
+
+```
+provider "tines" {
+    email    = var.tines_email
+    base_url = var.tines_base_url
+    token    = var.tines_token
+}
+```
+
 
 ## Examples
 

@@ -35,7 +35,7 @@ type Story struct {
 	KeepEventsFor int         `json:"keep_events_for" structs:"keep_events_for,omitempty"`
 	Priority      bool        `json:"priority" structs:"priority,omitempty"`
 	TeamID        int         `json:"team_id" structs:"team_id,omitempty"`
-	FolderID      string      `json:"folder_id" structs:"folder_id,omitempty"`
+	FolderID      int         `json:"folder_id" structs:"folder_id,omitempty"`
 	Unknowns      tcontainer.MarshalMap
 }
 

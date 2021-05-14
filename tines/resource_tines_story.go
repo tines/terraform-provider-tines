@@ -86,6 +86,7 @@ func resourceTinesStoryCreate(d *schema.ResourceData, meta interface{}) error {
 	teamID := d.Get("team_id").(int)
 	disabled := d.Get("disabled").(bool)
 	priority := d.Get("priority").(bool)
+	folderID := d.Get("folder_id").(int)
 
 	s := tines.Story{
 		Name:          name,
@@ -94,6 +95,7 @@ func resourceTinesStoryCreate(d *schema.ResourceData, meta interface{}) error {
 		TeamID:        teamID,
 		Disabled:      disabled,
 		Priority:      priority,
+		FolderID:      folderID,
 	}
 
 	story, _, err := tinesClient.Story.Create(&s)
@@ -159,6 +161,7 @@ func resourceTinesStoryUpdate(d *schema.ResourceData, meta interface{}) error {
 	teamID := d.Get("team_id").(int)
 	disabled := d.Get("disabled").(bool)
 	priority := d.Get("priority").(bool)
+	folderID := d.Get("folder_id").(int)
 	sid, _ := strconv.ParseInt(d.Id(), 10, 32)
 
 	s := tines.Story{
@@ -168,6 +171,7 @@ func resourceTinesStoryUpdate(d *schema.ResourceData, meta interface{}) error {
 		TeamID:        teamID,
 		Disabled:      disabled,
 		Priority:      priority,
+		FolderID:      folderID,
 	}
 
 	story, _, err := tinesClient.Story.Update(int(sid), &s)

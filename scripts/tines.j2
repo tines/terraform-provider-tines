@@ -26,12 +26,14 @@ resource "tines_global_resource" "{{ resource }}" {
     name = "{{ resource }}"
     value_type = "text"
     value = "replaceme"
+    team_id = var.team_id
 }
 {% endfor %}{% for credential in data.credentials %}
 resource "tines_credential" "{{ credential }}" {
     name = "{{ credential }}"
     mode = "TEXT"
     value = "replaceme"
+    team_id = var.team_id
 }
 {% endfor %}{% for agent in data.agents %}
 resource "tines_agent" "{{ agent.terraform_name  }}" {

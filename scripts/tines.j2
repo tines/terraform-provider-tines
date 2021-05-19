@@ -2,7 +2,7 @@ terraform {
     required_providers {
         tines = {
         source = "github.com/tuckner/tines"
-        version = ">=0.0.13"
+        version = ">=0.0.15"
         }
     }
 }
@@ -27,6 +27,12 @@ resource "tines_global_resource" "{{ resource }}" {
     value_type = "text"
     value = "replaceme"
 }
+{% endfor %}{% for credential in data.credentials %}
+resource "tines_credential" "{{ credential }}" {
+    name = "{{ credential }}"
+    mode = "TEXT"
+    value = "replaceme"
+}
 {% endfor %}{% for agent in data.agents %}
 resource "tines_agent" "{{ agent.terraform_name  }}" {
     name = "{{ agent.name }}"
@@ -41,15 +47,15 @@ resource "tines_agent" "{{ agent.terraform_name  }}" {
     }
     agent_options = jsonencode({{ agent.options | tojson }})
 }
-{% endfor %}{% for note in data.diagram_notes %}
-resource "tines_note" "note_{{ loop.index0 }}" {
+{% endfor %}{% for annotation in data.diagram_notes %}
+resource "tines_annotation" "annotation_{{ loop.index0 }}" {
     story_id = tines_story.{{ data.terraform_name }}.id
     content = <<EOF
-{{ note.content }}
+{{ annotation.content }}
 EOF
     position = {
-      x = {{ note.position[0] }}
-      y = {{ note.position[1] }}
+      x = {{ annotation.position[0] }}
+      y = {{ annotation.position[1] }}
     }
 }
 {% endfor %}

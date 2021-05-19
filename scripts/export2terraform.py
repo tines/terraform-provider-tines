@@ -13,19 +13,7 @@ rdme = """# {{ data.name }}
 {{ data.description | default('', true)  }}
 """
 
-tvar = """variable "tines_token" {
-    type = string
-}
-
-variable "tines_email" {
-    type = string
-}
-
-variable "tines_base_url" {
-    type = string
-}
-
-variable "team_id" {
+tvar = """variable "team_id" {
     type = number
     default = "1"
 }

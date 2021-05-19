@@ -64,6 +64,10 @@ def format_story(data):
 def get_global_resources(data):
   finds = re.findall(r'\.RESOURCE\.(.*?)[\.| |}]', str(data))
   return list(set(finds))
+  
+def get_credentials(data):
+  finds = re.findall(r'\.CREDENTIAL\.(.*?)[\.| |}]', str(data))
+  return list(set(finds))
 
 def run(event, context):
   data = {}
@@ -76,6 +80,7 @@ def run(event, context):
   format_action_data = format_action(receiver_data)
   export_data = format_story(format_action_data)
   export_data['global_resources'] = get_global_resources(export_data)
+  export_data['credentials'] = get_credentials(export_data)
   env = Environment(loader=FileSystemLoader('.'))
   template = env.get_template('tines.j2')
 

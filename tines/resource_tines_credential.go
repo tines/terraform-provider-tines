@@ -36,8 +36,9 @@ func resourceTinesCredential() *schema.Resource {
 				Optional: true,
 			},
 			"value": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
 			},
 			"jwt_algorithm": {
 				Type:     schema.TypeString,
@@ -52,8 +53,9 @@ func resourceTinesCredential() *schema.Resource {
 				Optional: true,
 			},
 			"jwt_private_key": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
 			},
 			"oauth_url": {
 				Type:     schema.TypeString,
@@ -68,8 +70,9 @@ func resourceTinesCredential() *schema.Resource {
 				Optional: true,
 			},
 			"oauth_client_secret": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
 			},
 			"oauth_scope": {
 				Type:     schema.TypeString,
@@ -88,8 +91,9 @@ func resourceTinesCredential() *schema.Resource {
 				Optional: true,
 			},
 			"aws_secret_key": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
 			},
 			"aws_assumed_role_arn": {
 				Type:     schema.TypeString,
@@ -112,8 +116,9 @@ func resourceTinesCredential() *schema.Resource {
 				Optional: true,
 			},
 			"mtls_client_private_key": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
 			},
 			"mtls_root_certificate": {
 				Type:     schema.TypeString,

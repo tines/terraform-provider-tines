@@ -16,11 +16,11 @@ func dataSourceTinesGlobalResource() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"value_type": {
+			"value": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"value": {
+			"read_access": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -28,7 +28,11 @@ func dataSourceTinesGlobalResource() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"grid": {
+			"folder_id": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"global_resource_id": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
@@ -51,9 +55,10 @@ func dataSourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{})
 	d.SetId(sgrid)
 	d.Set("name", globalresource.Name)
 	d.Set("value", globalresource.Value)
-	d.Set("value_type", globalresource.ValueType)
-	d.Set("grid", globalresource.ID)
 	d.Set("team_id", globalresource.TeamID)
+	d.Set("read_access", globalresource.ReadAccess)
+	d.Set("folder_id", globalresource.FolderID)
+	d.Set("global_resource_id", globalresource.ID)
 
 	return nil
 }

@@ -21,17 +21,17 @@ type GlobalResourceService struct {
 
 // GlobalResource structure
 type GlobalResource struct {
-	ID        int         `json:"id" structs:"id,omitempty"`
-	UserID    int         `json:"user_id" structs:"user_id,omitempty"`
-	Name      string      `json:"name" structs:"name,omitempty"`
-	ValueType string      `json:"value_type" structs:"value_type,omitempty"`
-	Value     string      `json:"value" structs:"value,omitempty"`
-	CreatedAt time.Time   `json:"created_at" structs:"created_at,omitempty"`
-	UpdatedAt time.Time   `json:"updated_at" structs:"updated_at,omitempty"`
-	Slug      string      `json:"slug" structs:"slug,omitempty"`
-	TeamID    int         `json:"team_id" structs:"team_id,omitempty"`
-	FolderID  int `json:"folder_id" structs:"folder_id,omitempty"`
-	Unknowns  tcontainer.MarshalMap
+	ID         int       `json:"id" structs:"id,omitempty"`
+	UserID     int       `json:"user_id" structs:"user_id,omitempty"`
+	Name       string    `json:"name" structs:"name,omitempty"`
+	Value      string    `json:"value" structs:"value,omitempty"`
+	ReadAccess string    `json:"read_access" structs:"read_access,omitempty"`
+	CreatedAt  time.Time `json:"created_at" structs:"created_at,omitempty"`
+	UpdatedAt  time.Time `json:"updated_at" structs:"updated_at,omitempty"`
+	Slug       string    `json:"slug" structs:"slug,omitempty"`
+	TeamID     int       `json:"team_id" structs:"team_id,omitempty"`
+	FolderID   int       `json:"folder_id" structs:"folder_id,omitempty"`
+	Unknowns   tcontainer.MarshalMap
 }
 
 // MarshalJSON is a custom JSON marshal function for the GlobalResource* structs.

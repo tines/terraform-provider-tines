@@ -25,6 +25,7 @@ type Credential struct {
 	Mode                       string `json:"mode" structs:"mode,omitempty"`
 	TeamID                     int    `json:"team_id" structs:"team_id,omitempty"`
 	FolderID                   int    `json:"folder_id" structs:"folder_id,omitempty"`
+	ReadAccess                 string `json:"read_access" structs:"read_access,omitempty"`
 	Value                      string `json:"value" structs:"value,omitempty"`
 	JWTAlgorithm               string `json:"jwt_algorithm" structs:"jwt_algorithm,omitempty"`
 	JWTPayload                 string `json:"jwt_payload" structs:"jwt_payload,omitempty"`

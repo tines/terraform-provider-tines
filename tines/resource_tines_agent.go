@@ -2,7 +2,6 @@ package tines
 
 import (
 	"encoding/json"
-	"log"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -114,7 +113,7 @@ func resourceTinesAgentCreate(d *schema.ResourceData, meta interface{}) error {
 
 	custom := tcontainer.NewMarshalMap()
 	custom["options"] = optionContainer
-	log.Printf("[DEBUG] Options block: %v", custom)
+	// log.Printf("[DEBUG] Options block: %v", custom)
 
 	a := tines.Agent{
 		Name:          name,
@@ -158,7 +157,7 @@ func resourceTinesAgentRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("story_id", agent.StoryID)
 	d.Set("user_id", agent.UserID)
 	d.Set("position", agent.Position)
-	d.Set("agent_type", d.Get("agent_type").(string))
+	d.Set("agent_type", agent.Type)
 
 	return nil
 }
@@ -185,10 +184,10 @@ func resourceTinesAgentUpdate(d *schema.ResourceData, meta interface{}) error {
 	agentType := d.Get("agent_type").(string)
 	storyID := d.Get("story_id").(int)
 	keepEventsFor := d.Get("keep_events_for").(int)
-	position := d.Get("position").(map[string]interface{})
 	sourceRaw := d.Get("source_ids").([]interface{})
 	receiveRaw := d.Get("receiver_ids").([]interface{})
 	options := d.Get("agent_options").(string)
+	position := d.Get("position").(map[string]interface{})
 
 	receiveID := make([]int, len(receiveRaw))
 	for i, v := range receiveRaw {
@@ -200,8 +199,11 @@ func resourceTinesAgentUpdate(d *schema.ResourceData, meta interface{}) error {
 		sourceID[i] = v.(int)
 	}
 
+	var optionContainer map[string]interface{}
+	json.Unmarshal([]byte(options), &optionContainer)
+
 	custom := tcontainer.NewMarshalMap()
-	custom["options"] = options
+	custom["options"] = optionContainer
 	// log.Printf("[DEBUG] Options block: %v", custom)
 
 	a := tines.Agent{

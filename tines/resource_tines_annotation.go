@@ -119,10 +119,6 @@ func resourceTinesAnnotationUpdate(d *schema.ResourceData, meta interface{}) err
 	snid := strconv.Itoa(annotation.ID)
 
 	d.SetId(snid)
-	d.Set("story_id", annotation.StoryID)
-	d.Set("position", annotation.Position)
-	d.Set("content", annotation.Content)
-	d.Set("annotation_id", annotation.ID)
 
 	return resourceTinesAnnotationRead(d, meta)
 }

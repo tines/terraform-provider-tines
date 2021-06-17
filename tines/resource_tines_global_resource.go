@@ -134,12 +134,6 @@ func resourceTinesGlobalResourceUpdate(d *schema.ResourceData, meta interface{})
 	sgrid := strconv.Itoa(globalresource.ID)
 
 	d.SetId(sgrid)
-	d.Set("name", globalresource.Name)
-	d.Set("value", globalresource.Value)
-	d.Set("read_access", globalresource.ReadAccess)
-	d.Set("team_id", globalresource.TeamID)
-	d.Set("folder_id", globalresource.FolderID)
-	d.Set("grid", globalresource.ID)
 
 	return resourceTinesGlobalResourceRead(d, meta)
 }

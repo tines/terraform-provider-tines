@@ -100,8 +100,6 @@ func resourceTinesTeamUpdate(d *schema.ResourceData, meta interface{}) error {
 	stid := strconv.Itoa(team.ID)
 
 	d.SetId(stid)
-	d.Set("team_id", team.ID)
-	d.Set("name", team.Name)
 
 	return resourceTinesTeamRead(d, meta)
 }

@@ -123,11 +123,6 @@ func resourceTinesFolderUpdate(d *schema.ResourceData, meta interface{}) error {
 	sfid := strconv.Itoa(folder.ID)
 
 	d.SetId(sfid)
-	d.Set("folder_id", folder.ID)
-	d.Set("name", folder.Name)
-	d.Set("team_id", folder.TeamID)
-	d.Set("content_type", folder.ContentType)
-	d.Set("size", folder.Size)
 
 	return resourceTinesFolderRead(d, meta)
 }

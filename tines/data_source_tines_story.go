@@ -89,7 +89,7 @@ func dataSourceTinesStoryRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("sid", story.ID)
 	d.Set("name", story.Name)
 	d.Set("description", story.Description)
-	d.Set("send_to_story", story.SendToStory)
+	d.Set("send_to_story", story.SendToStoryEnabled)
 	d.Set("entry_agent_id", story.EntryAgentID)
 	d.Set("disabled", story.Disabled)
 	d.Set("keep_events_for", story.KeepEventsFor)

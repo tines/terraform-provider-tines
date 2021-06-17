@@ -37,6 +37,7 @@ func Provider() terraform.ResourceProvider {
 			"tines_agent_modify":    resourceTinesAgentModify(),
 			"tines_annotation":      resourceTinesAnnotation(),
 			"tines_story":           resourceTinesStory(),
+			"tines_send_to_story":   resourceTinesSendToStory(),
 			"tines_credential":      resourceTinesCredential(),
 			"tines_team":            resourceTinesTeam(),
 			"tines_folder":          resourceTinesFolder(),

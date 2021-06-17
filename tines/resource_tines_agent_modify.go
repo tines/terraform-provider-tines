@@ -18,7 +18,7 @@ func resourceTinesAgentModify() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"agent_id": {
 				Type:     schema.TypeInt,
-				Optional: true,
+				Required: true,
 			},
 			"guid": {
 				Type:     schema.TypeString,

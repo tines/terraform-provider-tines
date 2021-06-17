@@ -62,6 +62,14 @@ func resourceTinesAgent() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
+			"monitor_failures": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"monitor_all_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
 			"position": {
 				Type:     schema.TypeMap,
 				Optional: true,
@@ -97,6 +105,7 @@ func resourceTinesAgentCreate(d *schema.ResourceData, meta interface{}) error {
 	receiveRaw := d.Get("receiver_ids").([]interface{})
 	options := d.Get("agent_options").(string)
 	position := d.Get("position").(map[string]interface{})
+	disabled := d.Get("disabled").(bool)
 
 	receiveID := make([]int, len(receiveRaw))
 	for i, v := range receiveRaw {
@@ -123,6 +132,7 @@ func resourceTinesAgentCreate(d *schema.ResourceData, meta interface{}) error {
 		SourceIds:     sourceID,
 		ReceiverIds:   receiveID,
 		Position:      position,
+		Disabled:      &disabled,
 		Unknowns:      custom,
 	}
 
@@ -158,6 +168,9 @@ func resourceTinesAgentRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("user_id", agent.UserID)
 	d.Set("position", agent.Position)
 	d.Set("agent_type", agent.Type)
+	d.Set("disabled", agent.Disabled)
+	d.Set("monitor_failures", agent.MonitorFailures)
+	d.Set("monitor_all_events", agent.MonitorAllEvents)
 
 	return nil
 }
@@ -188,6 +201,9 @@ func resourceTinesAgentUpdate(d *schema.ResourceData, meta interface{}) error {
 	receiveRaw := d.Get("receiver_ids").([]interface{})
 	options := d.Get("agent_options").(string)
 	position := d.Get("position").(map[string]interface{})
+	disabled := d.Get("disabled").(bool)
+	monitorFailures := d.Get("monitor_failures").(bool)
+	monitorAllEvents := d.Get("monitor_all_events").(bool)
 
 	receiveID := make([]int, len(receiveRaw))
 	for i, v := range receiveRaw {
@@ -207,14 +223,17 @@ func resourceTinesAgentUpdate(d *schema.ResourceData, meta interface{}) error {
 	// log.Printf("[DEBUG] Options block: %v", custom)
 
 	a := tines.Agent{
-		Name:          name,
-		Type:          agentType,
-		StoryID:       storyID,
-		KeepEventsFor: keepEventsFor,
-		SourceIds:     sourceID,
-		ReceiverIds:   receiveID,
-		Position:      position,
-		Unknowns:      custom,
+		Name:             name,
+		Type:             agentType,
+		StoryID:          storyID,
+		KeepEventsFor:    keepEventsFor,
+		SourceIds:        sourceID,
+		ReceiverIds:      receiveID,
+		Position:         position,
+		Disabled:         &disabled,
+		MonitorAllEvents: &monitorAllEvents,
+		MonitorFailures:  &monitorFailures,
+		Unknowns:         custom,
 	}
 
 	agent, _, err := tinesClient.Agent.Update(int(aid), &a)

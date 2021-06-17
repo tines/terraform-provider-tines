@@ -43,13 +43,24 @@ func resourceTinesStory() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"story_to_story": {
+			"story_to_story_enabled": {
 				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"story_to_story_access": {
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"entry_agent_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
+			},
+			"exit_agent_ids": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeInt,
+				},
 			},
 			"disabled": {
 				Type:     schema.TypeBool,
@@ -72,6 +83,10 @@ func resourceTinesStory() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"slug": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -93,8 +108,8 @@ func resourceTinesStoryCreate(d *schema.ResourceData, meta interface{}) error {
 		Description:   description,
 		KeepEventsFor: keepEventsFor,
 		TeamID:        teamID,
-		Disabled:      disabled,
-		Priority:      priority,
+		Disabled:      &disabled,
+		Priority:      &priority,
 		FolderID:      folderID,
 	}
 
@@ -127,13 +142,16 @@ func resourceTinesStoryRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("story_id", story.ID)
 	d.Set("name", story.Name)
 	d.Set("description", story.Description)
-	d.Set("send_to_story", story.SendToStory)
+	d.Set("send_to_story_enabled", story.SendToStoryEnabled)
+	d.Set("send_to_story_access", story.SendToStoryAccess)
 	d.Set("entry_agent_id", story.EntryAgentID)
+	d.Set("exit_agent_ids", story.ExitAgents)
 	d.Set("disabled", story.Disabled)
 	d.Set("keep_events_for", story.KeepEventsFor)
 	d.Set("priority", story.Priority)
 	d.Set("team_id", story.TeamID)
 	d.Set("folder_id", story.FolderID)
+	d.Set("slug", story.Slug)
 
 	return nil
 }
@@ -169,8 +187,8 @@ func resourceTinesStoryUpdate(d *schema.ResourceData, meta interface{}) error {
 		Description:   description,
 		KeepEventsFor: keepEventsFor,
 		TeamID:        teamID,
-		Disabled:      disabled,
-		Priority:      priority,
+		Disabled:      &disabled,
+		Priority:      &priority,
 		FolderID:      folderID,
 	}
 
@@ -182,17 +200,6 @@ func resourceTinesStoryUpdate(d *schema.ResourceData, meta interface{}) error {
 	ssid := strconv.Itoa(story.ID)
 
 	d.SetId(ssid)
-	d.Set("user_id", story.UserID)
-	d.Set("story_id", story.ID)
-	d.Set("name", story.Name)
-	d.Set("description", story.Description)
-	d.Set("send_to_story", story.SendToStory)
-	d.Set("entry_agent_id", story.EntryAgentID)
-	d.Set("disabled", story.Disabled)
-	d.Set("keep_events_for", story.KeepEventsFor)
-	d.Set("priority", story.Priority)
-	d.Set("team_id", story.TeamID)
-	d.Set("folder_id", story.FolderID)
 
 	return resourceTinesStoryRead(d, meta)
 }

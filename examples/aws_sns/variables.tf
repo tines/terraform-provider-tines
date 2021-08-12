@@ -1,19 +1,8 @@
-variable "tines_token" {
-    type = string
-}
-
-variable "tines_email" {
-    type = string
-}
-
 variable "tines_base_url" {
+    # ex: https://dappled-horse-1234.tines.io/
     type = string
 }
 
-# variable "aws_topic_arn" {
-#     type = string
-# }
-
-variable "story_id" {
+variable "tines_team" {
     type = number
 }

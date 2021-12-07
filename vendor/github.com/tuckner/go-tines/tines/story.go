@@ -39,6 +39,7 @@ type Story struct {
 	TeamID             int         `json:"team_id" structs:"team_id,omitempty"`
 	FolderID           int         `json:"folder_id" structs:"folder_id,omitempty"`
 	Slug               string      `json:"slug" structs:"slug,omitempty"`
+	PublishedState     string      `json:"published_state" structs:"published_state,omitempty"`
 	Unknowns           tcontainer.MarshalMap
 }
 

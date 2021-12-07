@@ -124,6 +124,14 @@ func resourceTinesCredential() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"read_access": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -155,6 +163,8 @@ func resourceTinesCredentialCreate(d *schema.ResourceData, meta interface{}) err
 	mtlsClientCertificate := d.Get("mtls_client_certificate").(string)
 	mtlsClientPrivateKey := d.Get("mtls_client_private_key").(string)
 	mtlsRootCertificate := d.Get("mtls_root_certificate").(string)
+	readAccess := d.Get("read_access").(string)
+	description := d.Get("description").(string)
 
 	tinesClient := meta.(*tines.Client)
 
@@ -184,6 +194,8 @@ func resourceTinesCredentialCreate(d *schema.ResourceData, meta interface{}) err
 		MTLSClientCertificate:      mtlsClientCertificate,
 		MTLSClientPrivateKey:       mtlsClientPrivateKey,
 		MTLSRootCertificate:        mtlsRootCertificate,
+		ReadAccess:                 readAccess,
+		Description:                description,
 	}
 
 	credential, _, err := tinesClient.Credential.Create(&c)
@@ -236,6 +248,8 @@ func resourceTinesCredentialRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("mtls_client_certificate", credential.MTLSClientCertificate)
 	d.Set("mtls_client_private_key", credential.MTLSClientPrivateKey)
 	d.Set("mtls_root_certificate", credential.MTLSRootCertificate)
+	d.Set("read_access", credential.ReadAccess)
+	d.Set("description", credential.Description)
 
 	return nil
 }
@@ -283,6 +297,8 @@ func resourceTinesCredentialUpdate(d *schema.ResourceData, meta interface{}) err
 	mtlsClientCertificate := d.Get("mtls_client_certificate").(string)
 	mtlsClientPrivateKey := d.Get("mtls_client_private_key").(string)
 	mtlsRootCertificate := d.Get("mtls_root_certificate").(string)
+	readAccess := d.Get("read_access").(string)
+	description := d.Get("description").(string)
 
 	gr := tines.Credential{
 		Name:                       name,
@@ -310,6 +326,8 @@ func resourceTinesCredentialUpdate(d *schema.ResourceData, meta interface{}) err
 		MTLSClientCertificate:      mtlsClientCertificate,
 		MTLSClientPrivateKey:       mtlsClientPrivateKey,
 		MTLSRootCertificate:        mtlsRootCertificate,
+		ReadAccess:                 readAccess,
+		Description:                description,
 	}
 
 	credential, _, err := tinesClient.Credential.Update(int(cid), &gr)

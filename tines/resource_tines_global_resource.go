@@ -39,6 +39,10 @@ func resourceTinesGlobalResource() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -50,15 +54,17 @@ func resourceTinesGlobalResourceCreate(d *schema.ResourceData, meta interface{})
 	readAccess := d.Get("read_access").(string)
 	teamID := d.Get("team_id").(int)
 	folderID := d.Get("folder_id").(int)
+	description := d.Get("description").(string)
 
 	tinesClient := meta.(*tines.Client)
 
 	gr := tines.GlobalResource{
-		Name:       name,
-		Value:      value,
-		ReadAccess: readAccess,
-		TeamID:     teamID,
-		FolderID:   folderID,
+		Name:        name,
+		Value:       value,
+		ReadAccess:  readAccess,
+		TeamID:      teamID,
+		FolderID:    folderID,
+		Description: description,
 	}
 
 	globalresource, _, err := tinesClient.GlobalResource.Create(&gr)
@@ -92,6 +98,7 @@ func resourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("read_access", globalresource.ReadAccess)
 	d.Set("folder_id", globalresource.FolderID)
 	d.Set("global_resource_id", globalresource.ID)
+	d.Set("description", globalresource.Description)
 
 	return nil
 }
@@ -117,13 +124,15 @@ func resourceTinesGlobalResourceUpdate(d *schema.ResourceData, meta interface{})
 	value := d.Get("value").(string)
 	readAccess := d.Get("read_access").(string)
 	folderID := d.Get("folder_id").(int)
+	description := d.Get("description").(string)
 	grid, _ := strconv.ParseInt(d.Id(), 10, 32)
 
 	gr := tines.GlobalResource{
-		Name:       name,
-		Value:      value,
-		ReadAccess: readAccess,
-		FolderID:   folderID,
+		Name:        name,
+		Value:       value,
+		ReadAccess:  readAccess,
+		FolderID:    folderID,
+		Description: description,
 	}
 
 	globalresource, _, err := tinesClient.GlobalResource.Update(int(grid), &gr)

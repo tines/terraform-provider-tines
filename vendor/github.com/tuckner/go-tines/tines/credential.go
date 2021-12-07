@@ -30,7 +30,7 @@ type Credential struct {
 	JWTAlgorithm               string `json:"jwt_algorithm" structs:"jwt_algorithm,omitempty"`
 	JWTPayload                 string `json:"jwt_payload" structs:"jwt_payload,omitempty"`
 	JWTAutoGenerateTimeClaims  bool   `json:"jwt_auto_generate_time_claims" structs:"jwt_auto_generate_time_claims,omitempty"`
-	JWTPrivateKey              string `json:"jwt_payload" structs:"jwt_payload,omitempty"`
+	JWTPrivateKey              string `json:"jwt_private_key" structs:"jwt_private_key,omitempty"`
 	OAuthURL                   string `json:"oauth_url" structs:"oauth_url,omitempty"`
 	OAuthTokenURL              string `json:"oauth_token_url" structs:"oauth_token_url,omitempty"`
 	OAuthClientID              string `json:"oauth_client_id" structs:"oauth_client_id,omitempty"`
@@ -47,6 +47,7 @@ type Credential struct {
 	MTLSClientCertificate      string `json:"mtls_client_certificate" structs:"mtls_client_certificate,omitempty"`
 	MTLSClientPrivateKey       string `json:"mtls_client_private_key" structs:"mtls_client_private_key,omitempty"`
 	MTLSRootCertificate        string `json:"mtls_root_certificate" structs:"mtls_root_certificate,omitempty"`
+	Description                string `json:"description" structs:"description,omitempty"`
 	Unknowns                   tcontainer.MarshalMap
 }
 

@@ -83,6 +83,10 @@ func resourceTinesStory() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"published_state": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"slug": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -102,15 +106,17 @@ func resourceTinesStoryCreate(d *schema.ResourceData, meta interface{}) error {
 	disabled := d.Get("disabled").(bool)
 	priority := d.Get("priority").(bool)
 	folderID := d.Get("folder_id").(int)
+	publishedState := d.Get("published_state").(string)
 
 	s := tines.Story{
-		Name:          name,
-		Description:   description,
-		KeepEventsFor: keepEventsFor,
-		TeamID:        teamID,
-		Disabled:      &disabled,
-		Priority:      &priority,
-		FolderID:      folderID,
+		Name:           name,
+		Description:    description,
+		KeepEventsFor:  keepEventsFor,
+		TeamID:         teamID,
+		Disabled:       &disabled,
+		Priority:       &priority,
+		FolderID:       folderID,
+		PublishedState: publishedState,
 	}
 
 	story, _, err := tinesClient.Story.Create(&s)
@@ -152,6 +158,7 @@ func resourceTinesStoryRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("team_id", story.TeamID)
 	d.Set("folder_id", story.FolderID)
 	d.Set("slug", story.Slug)
+	d.Set("published_state", story.PublishedState)
 
 	return nil
 }
@@ -180,16 +187,18 @@ func resourceTinesStoryUpdate(d *schema.ResourceData, meta interface{}) error {
 	disabled := d.Get("disabled").(bool)
 	priority := d.Get("priority").(bool)
 	folderID := d.Get("folder_id").(int)
+	publishedState := d.Get("published_state").(string)
 	sid, _ := strconv.ParseInt(d.Id(), 10, 32)
 
 	s := tines.Story{
-		Name:          name,
-		Description:   description,
-		KeepEventsFor: keepEventsFor,
-		TeamID:        teamID,
-		Disabled:      &disabled,
-		Priority:      &priority,
-		FolderID:      folderID,
+		Name:           name,
+		Description:    description,
+		KeepEventsFor:  keepEventsFor,
+		TeamID:         teamID,
+		Disabled:       &disabled,
+		Priority:       &priority,
+		FolderID:       folderID,
+		PublishedState: publishedState,
 	}
 
 	story, _, err := tinesClient.Story.Update(int(sid), &s)

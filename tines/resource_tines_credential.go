@@ -1,7 +1,9 @@
 package tines
 
 import (
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/tuckner/go-tines/tines"
@@ -217,7 +219,14 @@ func resourceTinesCredentialRead(d *schema.ResourceData, meta interface{}) error
 	cid, _ := strconv.ParseInt(d.Id(), 10, 32)
 	credential, _, err := tinesClient.Credential.Get(int(cid))
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] Error: %v", err)
+		if strings.Contains(err.Error(), "404") {
+			log.Printf("[INFO] Credential %v no longer exists", d.Id())
+			d.SetId("")
+			return nil
+		} else {
+			return err
+		}
 	}
 
 	scid := strconv.Itoa(credential.ID)

@@ -1,7 +1,9 @@
 package tines
 
 import (
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/tuckner/go-tines/tines"
@@ -81,7 +83,14 @@ func dataSourceTinesAgentRead(d *schema.ResourceData, meta interface{}) error {
 	aid := d.Get("id").(int)
 	agent, _, err := tinesClient.Agent.Get(aid)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] Error: %v", err)
+		if strings.Contains(err.Error(), "404") {
+			log.Printf("[INFO] Action %v no longer exists", d.Id())
+			d.SetId("")
+			return nil
+		} else {
+			return err
+		}
 	}
 
 	said := strconv.Itoa(agent.ID)

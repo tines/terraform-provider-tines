@@ -1,7 +1,9 @@
 package tines
 
 import (
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/tuckner/go-tines/tines"
@@ -79,9 +81,15 @@ func dataSourceTinesStoryRead(d *schema.ResourceData, meta interface{}) error {
 	sid := d.Get("id").(int)
 	story, _, err := tinesClient.Story.Get(sid)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] Error: %v", err)
+		if strings.Contains(err.Error(), "404") {
+			log.Printf("[INFO] Story %v no longer exists", d.Id())
+			d.SetId("")
+			return nil
+		} else {
+			return err
+		}
 	}
-
 	ssid := strconv.Itoa(story.ID)
 
 	d.SetId(ssid)

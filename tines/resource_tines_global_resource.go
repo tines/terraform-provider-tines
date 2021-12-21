@@ -1,7 +1,9 @@
 package tines
 
 import (
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/tuckner/go-tines/tines"
@@ -86,7 +88,14 @@ func resourceTinesGlobalResourceRead(d *schema.ResourceData, meta interface{}) e
 	grid, _ := strconv.ParseInt(d.Id(), 10, 32)
 	globalresource, _, err := tinesClient.GlobalResource.Get(int(grid))
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] Error: %v", err)
+		if strings.Contains(err.Error(), "404") {
+			log.Printf("[INFO] Resource %v no longer exists", d.Id())
+			d.SetId("")
+			return nil
+		} else {
+			return err
+		}
 	}
 
 	sgrid := strconv.Itoa(globalresource.ID)

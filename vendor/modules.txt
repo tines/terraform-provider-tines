@@ -251,7 +251,7 @@ github.com/spf13/afero/mem
 ## explicit
 github.com/trivago/tgo/tcontainer
 github.com/trivago/tgo/treflect
-# github.com/tuckner/go-tines v0.0.0-20211207145756-fc35c361d56c
+# github.com/tuckner/go-tines v0.0.0-20211221030852-a914cf7a76e2
 ## explicit
 github.com/tuckner/go-tines/tines
 # github.com/ulikunitz/xz v0.5.10

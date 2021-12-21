@@ -1,7 +1,9 @@
 package tines
 
 import (
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/tuckner/go-tines/tines"
@@ -72,7 +74,14 @@ func resourceTinesFolderRead(d *schema.ResourceData, meta interface{}) error {
 	fid, _ := strconv.ParseInt(d.Id(), 10, 32)
 	folder, _, err := tinesClient.Folder.Get(int(fid))
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] Error: %v", err)
+		if strings.Contains(err.Error(), "404") {
+			log.Printf("[INFO] Folder %v no longer exists", d.Id())
+			d.SetId("")
+			return nil
+		} else {
+			return err
+		}
 	}
 
 	sfid := strconv.Itoa(folder.ID)

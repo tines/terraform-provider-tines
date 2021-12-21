@@ -170,8 +170,11 @@ func CheckResponse(r *http.Response, req *http.Request) error {
 	}
 
 	reqbuf := new(bytes.Buffer)
-	reqbuf.ReadFrom(req.Body)
-	reqbody := reqbuf.String()
+	var reqbody = ""
+	if req.Body != nil {
+		reqbuf.ReadFrom(req.Body)
+		reqbody = reqbuf.String()
+	}
 
 	resbuf := new(bytes.Buffer)
 	resbuf.ReadFrom(r.Body)

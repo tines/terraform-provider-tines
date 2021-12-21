@@ -1,7 +1,9 @@
 package tines
 
 import (
+	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/tuckner/go-tines/tines"
@@ -69,7 +71,14 @@ func resourceTinesAnnotationRead(d *schema.ResourceData, meta interface{}) error
 	nid, _ := strconv.ParseInt(d.Id(), 10, 32)
 	annotation, _, err := tinesClient.Annotation.Get(int(nid))
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] Error: %v", err)
+		if strings.Contains(err.Error(), "404") {
+			log.Printf("[INFO] Annotation %v no longer exists", d.Id())
+			d.SetId("")
+			return nil
+		} else {
+			return err
+		}
 	}
 
 	snid := strconv.Itoa(annotation.ID)

@@ -3,7 +3,7 @@ HOSTNAME=github.com
 NAMESPACE=tines
 NAME=tines
 BINARY=terraform-provider-${NAME}
-VERSION=0.0.20
+VERSION=0.0.21
 OS_ARCH=darwin_amd64
 
 default: install

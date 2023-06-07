@@ -1,4 +1,4 @@
-# Terraform Provider for Tines.io
+# Terraform Provider for Tines
 
 ## Requirements
 

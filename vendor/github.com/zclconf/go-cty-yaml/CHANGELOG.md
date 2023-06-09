@@ -1,3 +1,10 @@
+# 1.0.3 (November 2, 2022)
+
+* The `YAMLDecodeFunc` cty function now correctly handles both entirely empty
+  documents and explicit top-level nulls. Previously it would always return
+  an unknown value in those cases; it now returns a null value as intended.
+  ([#7](https://github.com/zclconf/go-cty-yaml/pull/7))
+
 # 1.0.2 (June 17, 2020)
 
 * The YAML decoder now follows the YAML specification more closely when parsing

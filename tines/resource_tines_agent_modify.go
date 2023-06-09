@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/tines/go-tines/tines"
 	"github.com/trivago/tgo/tcontainer"
-	"github.com/tuckner/go-tines/tines"
 )
 
 func resourceTinesAgentModify() *schema.Resource {

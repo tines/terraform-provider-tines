@@ -25,9 +25,6 @@ var YAMLDecodeFunc = function.New(&function.Spec{
 		return Standard.ImpliedType([]byte(args[0].AsString()))
 	},
 	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-		if retType == cty.DynamicPseudoType {
-			return cty.DynamicVal, nil
-		}
 		return Standard.Unmarshal([]byte(args[0].AsString()), retType)
 	},
 })

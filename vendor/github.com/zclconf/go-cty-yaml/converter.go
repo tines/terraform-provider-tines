@@ -62,8 +62,8 @@ func (c *Converter) Marshal(v cty.Value) ([]byte, error) {
 // and attempts to convert it into a value conforming to the given type
 // constraint.
 //
-// An error is returned if the given source contains any YAML document
-// delimiters.
+// An error is returned if the given source contains more than one YAML
+// document.
 func (c *Converter) Unmarshal(src []byte, ty cty.Type) (cty.Value, error) {
 	return c.unmarshal(src, ty)
 }

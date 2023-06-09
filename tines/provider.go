@@ -3,7 +3,7 @@ package tines
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/tuckner/go-tines/tines"
+	"github.com/tines/go-tines/tines"
 )
 
 // Provider for Tines

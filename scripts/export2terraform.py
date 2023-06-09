@@ -71,8 +71,7 @@ def run(event, context):
   export_data['credentials'] = get_credentials(export_data)
   env = Environment(loader=FileSystemLoader('.'))
   template = env.get_template('tines.j2')
-
-  o = template.render(data=export_data)
+  o = template.render(data=export_data).replace('\\u003c', '<').replace('\\u003e', '>')
 
   ## Write Readme
   if event.get('blog'):
@@ -82,9 +81,8 @@ def run(event, context):
   data['readme'] = base64.b64encode(bytes(rdme_template.render(data=export_data), "utf-8")).decode('utf-8')
 
   ## Write main.tf
-  data['main'] = base64.b64encode(bytes(o, "utf-8")).decode('utf-8')
-
-  ## Write variables.tf
+  data['main'] = base64.b64encode(bytes(o, "utf-8"))
+  ## Write variables.tflab
   data['vars'] = base64.b64encode(bytes(tvar, "utf-8")).decode('utf-8')
 
   return data

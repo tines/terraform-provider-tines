@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/tuckner/go-tines/tines"
+	"github.com/tines/go-tines/tines"
 )
 
 func resourceTinesSendToStory() *schema.Resource {

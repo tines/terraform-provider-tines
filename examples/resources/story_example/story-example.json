@@ -1,0 +1,350 @@
+{
+  "schema_version": 18,
+  "standard_lib_version": 36,
+  "action_runtime_version": 4,
+  "name": "Imported story terraform",
+  "description": "In the simple story we will create a fictional situation where a detection system is configured to send alerts to our Tines tenant",
+  "guid": "fc5ca4f50902abf074ef9edc72fe22be",
+  "slug": "imported_story_terraform",
+  "agents": [
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "User is ceo",
+      "disabled": false,
+      "description": null,
+      "guid": "85b158606944f1965e15d098642ca642",
+      "origin_story_identifier": "cloud:da01f7810b72a1e6a5f2ecffe9db1bf1:fc5ca4f50902abf074ef9edc72fe22be",
+      "options": {
+        "rules": [
+          {
+            "path": "<<explode_users.user.job>>",
+            "type": "regex",
+            "value": "ceo"
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null
+      },
+      "visuals": {
+        "card_icon_image_contents": null,
+        "card_icon_image_filename": null,
+        "card_icon_name": null
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::EmailAgent",
+      "name": "Notify by email",
+      "disabled": false,
+      "description": null,
+      "guid": "7870ffe782ff3d1807c2276fc73ff497",
+      "origin_story_identifier": "cloud:da01f7810b72a1e6a5f2ecffe9db1bf1:fc5ca4f50902abf074ef9edc72fe22be",
+      "options": {
+        "body": "Hello,<br/><br/>An alert has been detected that relates to an infected engineer. The users details are shown below:<br/><b>Name:</b> <<explode_users.user.name>><br/><b>Age:</b> <<explode_users.user.age>><br/><b>Country:</b> <<explode_users.user.country>><br/><br/>Thanks!",
+        "recipients": "tinesdemouser@outlook.com",
+        "subject": "Engineer in infected"
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null
+      },
+      "visuals": {
+        "card_icon_image_contents": null,
+        "card_icon_image_filename": null,
+        "card_icon_name": null
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::WebhookAgent",
+      "name": "Receive events",
+      "disabled": false,
+      "description": null,
+      "guid": "e2a4b67c8db4a45c5cd1343fad80d218",
+      "origin_story_identifier": "cloud:da01f7810b72a1e6a5f2ecffe9db1bf1:fc5ca4f50902abf074ef9edc72fe22be",
+      "options": {
+        "include_headers": "false",
+        "secret": "201367c22bd83f4e79ac81aa9f9efb7c",
+        "verbs": "post",
+        "path": "62fa2dad5d5f309741b1885aad938d44"
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null
+      },
+      "visuals": {
+        "card_icon_image_contents": null,
+        "card_icon_image_filename": null,
+        "card_icon_name": null
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "Type is infection",
+      "disabled": false,
+      "description": null,
+      "guid": "971190ab43172d4c95da0032fb4737ea",
+      "origin_story_identifier": "cloud:da01f7810b72a1e6a5f2ecffe9db1bf1:fc5ca4f50902abf074ef9edc72fe22be",
+      "options": {
+        "rules": [
+          {
+            "path": "<<receive_events.type>>",
+            "type": "regex",
+            "value": "infection"
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null
+      },
+      "visuals": {
+        "card_icon_image_contents": null,
+        "card_icon_image_filename": null,
+        "card_icon_name": null
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::EventTransformationAgent",
+      "name": "Explode users",
+      "disabled": false,
+      "description": null,
+      "guid": "50aa8041001704da1f62a7226c19ccd0",
+      "origin_story_identifier": "cloud:da01f7810b72a1e6a5f2ecffe9db1bf1:fc5ca4f50902abf074ef9edc72fe22be",
+      "options": {
+        "mode": "explode",
+        "path": "=receive_events.users",
+        "to": "user"
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null
+      },
+      "visuals": {
+        "card_icon_image_contents": null,
+        "card_icon_image_filename": null,
+        "card_icon_name": null
+      },
+      "width": null,
+      "schedule": null
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "User is student",
+      "disabled": false,
+      "description": null,
+      "guid": "92e8be146287cd316200eca3041bf494",
+      "origin_story_identifier": "cloud:da01f7810b72a1e6a5f2ecffe9db1bf1:fc5ca4f50902abf074ef9edc72fe22be",
+      "options": {
+        "rules": [
+          {
+            "path": "<<explode_users.user.job>>",
+            "type": "regex",
+            "value": "student"
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null
+      },
+      "visuals": {
+        "card_icon_image_contents": null,
+        "card_icon_image_filename": null,
+        "card_icon_name": null
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::TriggerAgent",
+      "name": "User is engineer",
+      "disabled": false,
+      "description": null,
+      "guid": "5accad4f7f91cc3d5c83ed9bba5f3dda",
+      "origin_story_identifier": "cloud:da01f7810b72a1e6a5f2ecffe9db1bf1:fc5ca4f50902abf074ef9edc72fe22be",
+      "options": {
+        "rules": [
+          {
+            "path": "<<explode_users.user.job>>",
+            "type": "regex",
+            "value": "engineer"
+          }
+        ]
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null
+      },
+      "visuals": {
+        "card_icon_image_contents": null,
+        "card_icon_image_filename": null,
+        "card_icon_name": null
+      },
+      "width": null
+    },
+    {
+      "type": "Agents::HTTPRequestAgent",
+      "name": "Send a post request",
+      "disabled": false,
+      "description": null,
+      "guid": "bf9903705644de72b881c9bb2fed4f55",
+      "origin_story_identifier": "cloud:da01f7810b72a1e6a5f2ecffe9db1bf1:fc5ca4f50902abf074ef9edc72fe22be",
+      "options": {
+        "content_type": "json",
+        "log_error_on_status": [],
+        "method": "post",
+        "payload": {
+          "age": "<<explode_users.user.age>>",
+          "country": "<<explode_users.user.country>>",
+          "job": "<<explode_users.user.job>>",
+          "name": "<<explode_users.user.name>>"
+        },
+        "url": "https://postman-echo.com/post"
+      },
+      "reporting": {
+        "time_saved_value": 0,
+        "time_saved_unit": "minutes"
+      },
+      "monitoring": {
+        "monitor_all_events": false,
+        "monitor_failures": false,
+        "monitor_no_events_emitted": null
+      },
+      "template": {
+        "created_from_template_guid": null,
+        "created_from_template_version": null
+      },
+      "visuals": {
+        "card_icon_image_contents": null,
+        "card_icon_image_filename": null,
+        "card_icon_name": null
+      },
+      "width": null,
+      "schedule": null
+    }
+  ],
+  "diagram_notes": [],
+  "links": [
+    {
+      "source": 0,
+      "receiver": 7
+    },
+    {
+      "source": 2,
+      "receiver": 3
+    },
+    {
+      "source": 3,
+      "receiver": 4
+    },
+    {
+      "source": 4,
+      "receiver": 6
+    },
+    {
+      "source": 4,
+      "receiver": 5
+    },
+    {
+      "source": 4,
+      "receiver": 0
+    },
+    {
+      "source": 6,
+      "receiver": 1
+    }
+  ],
+  "diagram_layout": "{\"85b158606944f1965e15d098642ca642\":[105,-195],\"7870ffe782ff3d1807c2276fc73ff497\":[345,-120],\"e2a4b67c8db4a45c5cd1343fad80d218\":[345,-435],\"971190ab43172d4c95da0032fb4737ea\":[345,-360],\"50aa8041001704da1f62a7226c19ccd0\":[345,-285],\"92e8be146287cd316200eca3041bf494\":[570,-195],\"5accad4f7f91cc3d5c83ed9bba5f3dda\":[345,-195],\"bf9903705644de72b881c9bb2fed4f55\":[105,-120]}",
+  "send_to_story_enabled": false,
+  "entry_agent_guid": null,
+  "exit_agent_guids": [],
+  "exit_agent_guid": null,
+  "api_entry_action_guids": [],
+  "api_exit_action_guids": [],
+  "keep_events_for": 86400,
+  "reporting_status": true,
+  "send_to_story_access": null,
+  "story_library_metadata": {},
+  "monitor_failures": false,
+  "send_to_stories": [],
+  "form": null,
+  "synchronous_webhooks_enabled": false,
+  "forms": [],
+  "pages": [],
+  "tags": [],
+  "time_saved_unit": "minutes",
+  "time_saved_value": 0,
+  "origin_story_identifier": "cloud:da01f7810b72a1e6a5f2ecffe9db1bf1:fc5ca4f50902abf074ef9edc72fe22be",
+  "integration_product": null,
+  "integration_vendor": null,
+  "exported_at": "2023-09-27T21:12:10Z",
+  "integrations": []
+}

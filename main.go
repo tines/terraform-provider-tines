@@ -1,14 +1,32 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/plugin"
-	"github.com/tines/terraform-provider-tines/tines"
+	"context"
+	"flag"
+	"log"
+
+	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+	"github.com/tines/terraform-provider-tines/internal/provider"
 )
 
-// Generate the Terraform provider documentation using `tfplugindocs`:
-// go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
+// these will be set by the goreleaser configuration
+// to appropriate values for the compiled binary.
+var version = "dev"
 
 func main() {
-	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: tines.Provider})
+	var debug bool
+
+	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
+	flag.Parse()
+
+	opts := providerserver.ServeOpts{
+		Address: "registry.terraform.io/tines/tines",
+		Debug:   debug,
+	}
+
+	err := providerserver.Serve(context.Background(), provider.New(version), opts)
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }

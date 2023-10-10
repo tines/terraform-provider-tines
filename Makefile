@@ -26,4 +26,5 @@ install:
 # Generate docs
 .PHONY: docs
 docs:
+	go get github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
 	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs

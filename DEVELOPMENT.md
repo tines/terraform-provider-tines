@@ -1,6 +1,6 @@
 # Install
 
-- `make setup`
+- `make install`
 
 # Setup
 

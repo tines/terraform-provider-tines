@@ -18,6 +18,7 @@ import (
 type Client struct {
 	apiToken  string
 	tenantUrl string
+	version   string
 	client    *http.Client
 }
 
@@ -93,6 +94,7 @@ func (c *Client) ImportStory(ctx context.Context, storyData []byte) (sr StoryRes
 	req.Header.Set("content-type", "application/json")
 	req.Header.Add("Accept", "application/json")
 	req.Header.Set("User-Agent", "tines-terraform-client")
+	req.Header.Set("x-tines-client-version", fmt.Sprintf("tines-terraform-provider-%s", c.version))
 	req.Header.Set("x-user-token", c.apiToken)
 
 	res, err := c.client.Do(req)
@@ -135,6 +137,7 @@ func (c *Client) DeleteStory(ctx context.Context, storyID basetypes.Int64Value) 
 	req.Header.Set("content-type", "application/json")
 	req.Header.Add("Accept", "application/json")
 	req.Header.Set("User-Agent", "tines-terraform-client")
+	req.Header.Set("x-tines-client-version", fmt.Sprintf("tines-terraform-provider-%s", c.version))
 	req.Header.Set("x-user-token", c.apiToken)
 
 	res, err := c.client.Do(req)

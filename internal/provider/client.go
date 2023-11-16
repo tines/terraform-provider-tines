@@ -92,6 +92,7 @@ func (c *Client) ImportStory(ctx context.Context, storyData []byte) (sr StoryRes
 	}
 	req.Header.Set("content-type", "application/json")
 	req.Header.Add("Accept", "application/json")
+	req.Header.Set("User-Agent", "tines-terraform-client")
 	req.Header.Set("x-user-token", c.apiToken)
 
 	res, err := c.client.Do(req)
@@ -133,6 +134,7 @@ func (c *Client) DeleteStory(ctx context.Context, storyID basetypes.Int64Value) 
 	}
 	req.Header.Set("content-type", "application/json")
 	req.Header.Add("Accept", "application/json")
+	req.Header.Set("User-Agent", "tines-terraform-client")
 	req.Header.Set("x-user-token", c.apiToken)
 
 	res, err := c.client.Do(req)

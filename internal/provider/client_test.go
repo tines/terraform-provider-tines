@@ -56,6 +56,7 @@ func TestImportStory(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("content-type"))
 		assert.Equal(t, "application/json", r.Header.Get("Accept"))
 		assert.Equal(t, "dummyToken", r.Header.Get("x-user-token"))
+		assert.Equal(t, "tines-terraform-client", r.Header.Get("User-Agent"))
 
 		var data StoryImportRequest
 		body, err := io.ReadAll(r.Body)
@@ -109,6 +110,7 @@ func TestFailedImportStory(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("content-type"))
 		assert.Equal(t, "application/json", r.Header.Get("Accept"))
 		assert.Equal(t, "dummyToken", r.Header.Get("x-user-token"))
+		assert.Equal(t, "tines-terraform-client", r.Header.Get("User-Agent"))
 	}))
 	defer ts.Close()
 
@@ -136,6 +138,7 @@ func TestDeleteStory(t *testing.T) {
 		assert.Equal(t, "application/json", r.Header.Get("content-type"))
 		assert.Equal(t, "application/json", r.Header.Get("Accept"))
 		assert.Equal(t, "dummyToken", r.Header.Get("x-user-token"))
+		assert.Equal(t, "tines-terraform-client", r.Header.Get("User-Agent"))
 	}))
 	defer ts.Close()
 	client, err := NewClient()

@@ -57,6 +57,7 @@ func (p *TinesProvider) Configure(ctx context.Context, req provider.ConfigureReq
 		)
 		return
 	}
+	client.version = p.version
 
 	// Make the Tines client available during DataSource and Resource
 	// type Configure methods.

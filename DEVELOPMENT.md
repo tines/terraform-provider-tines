@@ -50,3 +50,8 @@ provider_installation{
     direct{}
 }
 ```
+
+# Using terraform-provider-tines locally
+
+- Ensure above steps are performed
+- Run `make install-local`

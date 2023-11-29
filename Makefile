@@ -28,3 +28,8 @@ install:
 docs:
 	go get github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
 	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
+
+# Run local install
+.PHONY: install-local
+install:
+	go install

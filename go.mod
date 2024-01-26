@@ -3,7 +3,7 @@ module github.com/tines/terraform-provider-tines
 go 1.21.0
 
 require (
-	github.com/hashicorp/terraform-plugin-framework v1.4.1
+	github.com/hashicorp/terraform-plugin-framework v1.5.0
 	github.com/hashicorp/terraform-plugin-go v0.21.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-testing v1.5.1
@@ -13,7 +13,6 @@ require (
 require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
-	golang.org/x/tools v0.13.0 // indirect
 )
 
 require (

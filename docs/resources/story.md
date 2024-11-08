@@ -3,12 +3,12 @@
 page_title: "tines_story Resource - terraform-provider-tines"
 subcategory: ""
 description: |-
-  Manage a Tines Story.
+  Manage a Tines Story
 ---
 
 # tines_story (Resource)
 
-Manage a Tines Story.
+Manage a Tines Story
 
 
 
@@ -17,15 +17,39 @@ Manage a Tines Story.
 
 ### Required
 
-- `data` (String) Tines Story export that gets read in from a JSON file
-- `tenant_url` (String) Tines tenant URL
-- `tines_api_token` (String, Sensitive) API token for Tines Tenant
+- `data` (String) A local JSON file containing an exported Tines story. Setting this value can only be combined with the team_id and folder_id attributes.
+- `team_id` (Number) The ID of the team that this story belongs to.
 
 ### Optional
 
-- `folder_id` (Number) Tines folder ID.
-- `team_id` (Number) Tines team ID.
+- `folder_id` (Number) The ID of the folder where this story should be organized. The folder ID must belong to the associated team that owns this story.
+- `name` (String) The name of the Tines story.
+- `tenant_url` (String, Deprecated) [DEPRECATED] Tines tenant URL
+- `tines_api_token` (String, Sensitive, Deprecated) [DEPRECATED] API token for Tines Tenant
 
 ### Read-Only
 
-- `id` (Number) Tines Story identifier.
+- `change_control_enabled` (Boolean)
+- `created_at` (String)
+- `description` (String)
+- `disabled` (Boolean)
+- `edited_at` (String)
+- `entry_agent_id` (Number)
+- `exit_agents` (List of Number)
+- `guid` (String)
+- `id` (Number) The Tines-generated identifier for this story.
+- `keep_events_for` (Number)
+- `last_updated` (String)
+- `locked` (Boolean)
+- `mode` (String)
+- `owners` (List of Number)
+- `priority` (Boolean)
+- `published` (Boolean)
+- `send_to_story_access` (String)
+- `send_to_story_access_source` (String)
+- `send_to_story_enabled` (Boolean)
+- `send_to_story_skill_use_requires_confirmation` (Boolean)
+- `shared_team_slugs` (List of String)
+- `slug` (String)
+- `tags` (List of String)
+- `user_id` (Number)

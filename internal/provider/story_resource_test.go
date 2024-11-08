@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 	"github.com/stretchr/testify/assert"
+	"github.com/tines/terraform-provider-tines/internal/tines_cli"
 )
 
 var (
@@ -36,7 +37,7 @@ func TestStoryResourceCreate(t *testing.T) {
 			_, cErr := io.Copy(w, f)
 			assert.Nil(t, cErr)
 
-			var data StoryImportRequest
+			var data tines_cli.StoryImportRequest
 			body, err := io.ReadAll(r.Body)
 			assert.Nil(t, err)
 			err = json.Unmarshal(body, &data)
@@ -87,7 +88,7 @@ func TestStoryUpdateInPlace(t *testing.T) {
 			_, cErr := io.Copy(w, f)
 			assert.Nil(t, cErr)
 
-			var data StoryImportRequest
+			var data tines_cli.StoryImportRequest
 			body, err := io.ReadAll(r.Body)
 			assert.Nil(t, err)
 			err = json.Unmarshal(body, &data)

@@ -44,7 +44,7 @@ func (p *TinesProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"tenant": schema.StringAttribute{
-				Required: true,
+				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.RegexMatches(
 						regexp.MustCompile(`^https:\/\/[a-zA-Z0-9-\.]+\.[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+$`),
@@ -53,7 +53,7 @@ func (p *TinesProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp
 				},
 			},
 			"api_key": schema.StringAttribute{
-				Required:  true,
+				Optional:  true,
 				Sensitive: true,
 			},
 		},

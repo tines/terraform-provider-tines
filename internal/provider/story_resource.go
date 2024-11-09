@@ -25,7 +25,7 @@ type storyResource struct {
 }
 
 // Prior schema data to enable upgrade of existing tfstate files to
-// the current schema version
+// the current schema version.
 type storyResourceModelV0 struct {
 	Data          types.String `tfsdk:"data"`
 	ID            types.Int64  `tfsdk:"id"`
@@ -249,8 +249,14 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
+	name, ok := data["name"].(string)
+	if !ok {
+		resp.Diagnostics.AddError("Invalid string", "The 'name' field in the imported story must be a string")
+		return
+	}
+
 	var importRequest = tines_cli.StoryImportRequest{
-		NewName:  data["name"].(string),
+		NewName:  name,
 		Data:     data,
 		TeamID:   plan.TeamID.ValueInt64(),
 		FolderID: plan.FolderID.ValueInt64(),
@@ -266,7 +272,7 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
-	// Populate all the computed values in the plan
+	// Populate all the computed values in the plan.
 	plan.ID = types.Int64Value(story.ID)
 	plan.Name = types.StringValue(story.Name)
 	plan.UserID = types.Int64Value(story.UserID)
@@ -311,7 +317,7 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 	}
 	plan.LastUpdated = types.StringValue(time.Now().Format(time.RFC850))
 
-	// Set state to fully populated data
+	// Set state to fully populated data.
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -319,11 +325,11 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 	}
 }
 
-// Retrieve the current infrastructure state
+// Retrieve the current infrastructure state.
 func (r *storyResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var localState storyResourceModel
 
-	// Read Terraform prior state data into the model
+	// Read Terraform prior state data into the model.
 	resp.Diagnostics.Append(req.State.Get(ctx, &localState)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -341,7 +347,7 @@ func (r *storyResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	}
 
 	// Treat HTTP 404 Not Found status as a signal to recreate resource
-	// and return early
+	// and return early.
 	if status == 404 {
 		resp.State.RemoveResource(ctx)
 		return
@@ -350,7 +356,7 @@ func (r *storyResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	localState.TeamID = types.Int64Value(remoteState.TeamID)
 	localState.FolderID = types.Int64Value(remoteState.FolderID)
 
-	// Set refreshed state
+	// Set refreshed state.
 	resp.Diagnostics.Append(resp.State.Set(ctx, &localState)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -383,8 +389,14 @@ func (r *storyResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		return
 	}
 
+	name, ok := data["name"].(string)
+	if !ok {
+		resp.Diagnostics.AddError("Invalid string", "The 'name' field in the imported story must be a string")
+		return
+	}
+
 	var importRequest = tines_cli.StoryImportRequest{
-		NewName:  data["name"].(string),
+		NewName:  name,
 		Data:     data,
 		TeamID:   plan.TeamID.ValueInt64(),
 		FolderID: plan.FolderID.ValueInt64(),
@@ -400,7 +412,7 @@ func (r *storyResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		return
 	}
 
-	// Populate all the computed values in the plan
+	// Populate all the computed values in the plan.
 	plan.ID = types.Int64Value(story.ID)
 	plan.Name = types.StringValue(story.Name)
 	plan.UserID = types.Int64Value(story.UserID)
@@ -463,7 +475,7 @@ func (r *storyResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 		return
 	}
 
-	// Delete existing story
+	// Delete existing story.
 	err := r.client.DeleteStory(state.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -476,7 +488,7 @@ func (r *storyResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 
 func (r *storyResource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	return map[int64]resource.StateUpgrader{
-		// State upgrade implementation from 0 (existing state version) to 1 (current Schema.Version)
+		// State upgrade implementation from 0 (existing state version) to 1 (current Schema.Version).
 		0: {
 			PriorSchema: &schema.Schema{
 				Attributes: map[string]schema.Attribute{

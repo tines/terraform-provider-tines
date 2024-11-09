@@ -50,7 +50,7 @@ func TestImportStory(t *testing.T) {
 				"locked": false
 			}`)
 
-		w.Write(res)
+		w.Write(res) //nolint:errcheck
 
 	}))
 	defer ts.Close()
@@ -65,13 +65,16 @@ func TestImportStory(t *testing.T) {
 
 	var data map[string]interface{}
 	f, err := os.ReadFile("testdata/test-import-story.json")
-	assert.Nil(err, "should open and read the JSON test file")
+	assert.Nil(err, "It should open and read the JSON test file")
 
 	err = json.Unmarshal(f, &data)
-	assert.Nil(err, "should unmarshal the JSON without errors")
+	assert.Nil(err, "It should unmarshal the JSON without errors")
+
+	name, ok := data["name"].(string)
+	assert.True(ok, "It should assert that the 'name' field in the data interface is a string type")
 
 	storyImportRequest := StoryImportRequest{
-		NewName: data["name"].(string),
+		NewName: name,
 		Data:    data,
 		TeamID:  1,
 		Mode:    "versionReplace",
@@ -79,7 +82,7 @@ func TestImportStory(t *testing.T) {
 
 	story, err := c.ImportStory(&storyImportRequest)
 
-	assert.Nil(err, "should import the story without API errors")
+	assert.Nil(err, "It should import the story without API errors")
 	assert.Equal(int64(0), story.FolderID, "The folder ID should be coerced to 0 if the story is not in a folder")
 	assert.Equal(int64(1), story.TeamID, "The story should be imported to the correct team")
 	assert.False(story.Disabled, "The story should not be disabled")

@@ -43,7 +43,7 @@ type Story struct {
 	Owners               []int64  `json:"owners"`
 }
 
-// Import a new story, or update an existing one
+// Import a new story, or update an existing one.
 func (c *Client) ImportStory(story *StoryImportRequest) (*Story, error) {
 	newStory := Story{}
 
@@ -65,7 +65,7 @@ func (c *Client) ImportStory(story *StoryImportRequest) (*Story, error) {
 	return &newStory, nil
 }
 
-// Get current state for a story
+// Get current state for a story.
 func (c *Client) GetStory(id int64) (status int, story *Story, e error) {
 	resource := fmt.Sprintf("/api/v1/stories/%d", id)
 
@@ -82,7 +82,7 @@ func (c *Client) GetStory(id int64) (status int, story *Story, e error) {
 	return status, story, err
 }
 
-// Delete a story
+// Delete a story.
 func (c *Client) DeleteStory(id int64) error {
 	resource := fmt.Sprintf("/api/v1/stories/%d", id)
 

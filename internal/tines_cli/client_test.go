@@ -19,7 +19,7 @@ func TestTinesClient(t *testing.T) {
 		assert.Equal("tines-terraform-provider-test", r.Header.Get("x-tines-client-version"))
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
+		w.Write([]byte("ok")) //nolint:errcheck
 	}))
 	defer ts.Close()
 

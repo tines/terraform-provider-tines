@@ -30,6 +30,7 @@ jobs:
           version: latest
 
   generate:
+    name: Docs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
@@ -40,7 +41,7 @@ jobs:
       - run: make docs
       - name: git diff
         run: |
-          git diff --compact-summary --exit-code || \
+          git diff --compact-summary --exit-code -- docs || \
             (echo; echo "Unexpected difference in directories after code generation. Run 'make docs' command and commit."; exit 1)
 
   test:

@@ -25,7 +25,7 @@ Manage a Tines Story
 - `folder_id` (Number) The ID of the folder where this story should be organized. The folder ID must belong to the associated team that owns this story.
 - `name` (String) The name of the Tines story.
 - `tenant_url` (String, Deprecated) [DEPRECATED] Tines tenant URL
-- `tines_api_token` (String, Sensitive, Deprecated) [DEPRECATED] API token for Tines Tenant
+- `tines_api_token` (String, Sensitive, Deprecated) API token for Tines Tenant
 
 ### Read-Only
 

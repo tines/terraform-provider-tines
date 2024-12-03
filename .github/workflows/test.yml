@@ -42,7 +42,7 @@ jobs:
             (echo; echo "Unexpected difference in directories after code generation. Run 'make docs' command and commit."; exit 1)
 
   test-cli:
-    name: Tines CLI Unit Tests
+    name: Tines API Client Unit Tests
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +52,7 @@ jobs:
             go-version-file: "go.mod"
             cache: true
       - run: go mod download
-      - run: go test -v -cover ./internal/tines_cli
+      - run: go test -v -cover ./internal/tines_cli/
 
   test-provider:
     name: Terraform Provider Acceptance Tests
@@ -61,6 +61,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       fail-fast: false
+      max-parallel: 1 # Required to avoid resource conflicts in the test tenant
       matrix:
         terraform:
           - "1.1.*"

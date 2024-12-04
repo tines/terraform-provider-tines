@@ -8,7 +8,14 @@ description: |-
 # Tines Provider
 
 The Tines provider is used to interact with resources supported by Tines. 
-The provider needs to be configured with the proper credentials before it can be used.
+The provider needs to be configured with the proper credentials before it can be used. 
+
+## Upgrading Versions
+Because the Tines Terraform provider is still under active development, breaking changes
+may occur in minor versions for any 0.x.x release. Future stable versions (1.x.x and above)
+will follow SemVer principles for backwards compatibility in minor and patch version updates.
+
+Be sure to read the version upgrade guides to understand any breaking changes before upgrading.
 
 ## Example Usage
 

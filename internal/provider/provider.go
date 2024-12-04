@@ -129,7 +129,7 @@ func (p *TinesProvider) Configure(ctx context.Context, req provider.ConfigureReq
 	}
 
 	// Create a new Tines client using the configuration values.
-	c, err := tines_cli.NewClient(&tenant, &apiKey, &p.version)
+	c, err := tines_cli.NewClient(tenant, apiKey, p.version)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to Create Tines API Client",

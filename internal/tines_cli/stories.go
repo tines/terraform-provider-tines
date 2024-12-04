@@ -48,20 +48,18 @@ func (c *Client) CreateStory(new *Story) (*Story, error) {
 	newStory := Story{}
 
 	req, err := json.Marshal(&new)
-	fmt.Printf("REQUEST BODY: %s", string(req))
 	if err != nil {
-		return &newStory, err
+		return nil, err
 	}
 
-	status, body, err := c.doRequest("POST", "/api/v1/stories", req)
+	body, err := c.doRequest("POST", "/api/v1/stories", req)
 	if err != nil {
-		return &newStory, err
+		return nil, err
 	}
 
 	err = json.Unmarshal(body, &newStory)
 	if err != nil {
-		fmt.Printf("HTTP STATUS: %d, BODY: %s", status, string(body))
-		return &newStory, err
+		return nil, err
 	}
 
 	return &newStory, nil
@@ -71,26 +69,26 @@ func (c *Client) CreateStory(new *Story) (*Story, error) {
 func (c *Client) DeleteStory(id int64) error {
 	resource := fmt.Sprintf("/api/v1/stories/%d", id)
 
-	_, _, err := c.doRequest("DELETE", resource, nil)
+	_, err := c.doRequest("DELETE", resource, nil)
 
 	return err
 }
 
 // Get current state for a story.
-func (c *Client) GetStory(id int64) (status int, story *Story, e error) {
+func (c *Client) GetStory(id int64) (story *Story, e error) {
 	resource := fmt.Sprintf("/api/v1/stories/%d", id)
 
-	status, body, err := c.doRequest("GET", resource, nil)
-	if err != nil || status == 404 {
-		return status, nil, err
+	body, err := c.doRequest("GET", resource, nil)
+	if err != nil {
+		return nil, err
 	}
 
 	err = json.Unmarshal(body, &story)
 	if err != nil {
-		return status, nil, err
+		return nil, err
 	}
 
-	return status, story, err
+	return story, nil
 }
 
 // Import a new story, or override an existing one.
@@ -99,17 +97,17 @@ func (c *Client) ImportStory(story *StoryImportRequest) (*Story, error) {
 
 	req, err := json.Marshal(&story)
 	if err != nil {
-		return &newStory, err
+		return nil, err
 	}
 
-	_, body, err := c.doRequest("POST", "/api/v1/stories/import", req)
+	body, err := c.doRequest("POST", "/api/v1/stories/import", req)
 	if err != nil {
-		return &newStory, err
+		return nil, err
 	}
 
 	err = json.Unmarshal(body, &newStory)
 	if err != nil {
-		return &newStory, err
+		return nil, err
 	}
 
 	return &newStory, nil
@@ -125,15 +123,15 @@ func (c *Client) UpdateStory(id int64, values *Story) (*Story, error) {
 		return &updatedStory, err
 	}
 
-	_, body, err := c.doRequest("PUT", resource, req)
+	body, err := c.doRequest("PUT", resource, req)
 	if err != nil {
-		return &updatedStory, err
+		return nil, err
 	}
 
 	err = json.Unmarshal(body, &updatedStory)
 	if err != nil {
-		return &updatedStory, err
+		return nil, err
 	}
 
-	return &updatedStory, err
+	return &updatedStory, nil
 }

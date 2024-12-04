@@ -24,18 +24,17 @@ func TestTinesClient(t *testing.T) {
 	defer ts.Close()
 
 	// Validate that the Tines CLI gets instantiated correctly
-	tenant := &ts.URL
+	tenant := ts.URL
 	apiKey := "foo"
 	version := "test"
 
-	client, err := NewClient(tenant, &apiKey, &version)
+	client, err := NewClient(tenant, apiKey, version)
 
 	assert.Nil(err, "the Tines CLI client should instantiate successfully")
 
 	// Validate that a generic HTTP request fires as expected
-	status, res, err := client.doRequest("GET", "/", nil)
+	res, err := client.doRequest("GET", "/", nil)
 
-	assert.Equal(http.StatusOK, status, "the server should return a success response status")
 	assert.Equal([]byte("ok"), res, "the server should return an expected response body")
 	assert.Nil(err, "the request should not return an error")
 }

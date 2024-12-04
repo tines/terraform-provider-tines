@@ -121,16 +121,10 @@ func (r *storyResource) Schema(ctx context.Context, _ resource.SchemaRequest, re
 				Description:        "Tines tenant URL",
 				Optional:           true,
 				DeprecationMessage: "Value will be overridden by the value set in the provider credentials. This field will be removed in a future version.",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
 			"team_id": schema.Int64Attribute{
 				Description: "The ID of the team that this story belongs to.",
 				Required:    true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.RequiresReplace(),
-				},
 			},
 			"folder_id": schema.Int64Attribute{
 				Description: "The ID of the folder where this story should be organized. The folder ID must belong to the associated team that owns this story.",
@@ -138,7 +132,6 @@ func (r *storyResource) Schema(ctx context.Context, _ resource.SchemaRequest, re
 				Computed:    true,
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
-					int64planmodifier.RequiresReplace(),
 				},
 			},
 			"name": schema.StringAttribute{
@@ -152,6 +145,9 @@ func (r *storyResource) Schema(ctx context.Context, _ resource.SchemaRequest, re
 			"user_id": schema.Int64Attribute{
 				Description: "ID of the story creator.",
 				Computed:    true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
+				},
 			},
 			"description": schema.StringAttribute{
 				Description: "A user-defined description of the story.",
@@ -471,21 +467,23 @@ func (r *storyResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		return
 	}
 
-	status, remoteState, err := r.client.GetStory(localState.ID.ValueInt64())
+	remoteState, err := r.client.GetStory(localState.ID.ValueInt64())
 	if err != nil {
+		// Treat HTTP 404 Not Found status as a signal to recreate resource
+		// and return early.
+		if tinesErr, ok := err.(tines_cli.Error); ok {
+			if tinesErr.StatusCode == 404 {
+				resp.State.RemoveResource(ctx)
+				return
+			}
+		}
+
 		resp.Diagnostics.AddError(
 			"Unable to Refresh Resource",
 			"An unexpected error occurred while attempting to refresh resource state. "+
 				"Please retry the operation or report this issue to the provider developers.\n\n"+
 				"HTTP Error: "+err.Error(),
 		)
-		return
-	}
-
-	// Treat HTTP 404 Not Found status as a signal to recreate resource
-	// and return early.
-	if status == 404 {
-		resp.State.RemoveResource(ctx)
 		return
 	}
 
@@ -507,15 +505,20 @@ func (r *storyResource) Read(ctx context.Context, req resource.ReadRequest, resp
 func (r *storyResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	tflog.Info(ctx, "Updating Story")
 
-	var plan storyResourceModel
+	var plan, state storyResourceModel
 	var story *tines_cli.Story
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	diags = req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	if !plan.Data.IsNull() {
+	if !plan.Data.IsNull() && !plan.Data.Equal(state.Data) {
 		tflog.Info(ctx, "Exported Story payload detected, using the Import strategy")
 		story, diags = r.runImportStory(&plan)
 		resp.Diagnostics.Append(diags...)
@@ -675,11 +678,58 @@ func (r *storyResource) convertPlanToStory(ctx context.Context, plan *storyResou
 		story.KeepEventsFor = plan.KeepEventsFor.ValueInt64()
 	}
 
+	if !plan.Disabled.IsNull() && !plan.Disabled.IsUnknown() {
+		story.Disabled = plan.Disabled.ValueBool()
+	}
+
+	if !plan.Locked.IsNull() && !plan.Locked.IsUnknown() {
+		story.Locked = plan.Locked.ValueBool()
+	}
+
+	if !plan.Priority.IsNull() && !plan.Priority.IsUnknown() {
+		story.Priority = plan.Priority.ValueBool()
+	}
+
+	if !plan.STSEnabled.IsNull() && !plan.Priority.IsUnknown() {
+		story.STSEnabled = plan.STSEnabled.ValueBool()
+	}
+
+	if !plan.STSAccessSource.IsNull() && !plan.STSAccessSource.IsUnknown() {
+		story.STSAccessSource = plan.STSAccessSource.ValueString()
+	}
+
+	if !plan.STSAccess.IsNull() && !plan.STSAccess.IsUnknown() {
+		story.STSAccess = plan.STSAccess.ValueString()
+	}
+
 	if !plan.SharedTeamSlugs.IsNull() && !plan.SharedTeamSlugs.IsUnknown() {
 		diags = plan.SharedTeamSlugs.ElementsAs(ctx, story.SharedTeamSlugs, false)
 		if diags.HasError() {
 			return
 		}
+	}
+
+	if !plan.STSSkillConfirmation.IsNull() && !plan.STSSkillConfirmation.IsUnknown() {
+		story.STSSkillConfirmation = plan.STSSkillConfirmation.ValueBool()
+	}
+
+	if !plan.EntryAgentID.IsNull() && !plan.EntryAgentID.IsUnknown() {
+		story.EntryAgentID = plan.EntryAgentID.ValueInt64()
+	}
+
+	if !plan.ExitAgents.IsNull() && !plan.ExitAgents.IsUnknown() {
+		diags = plan.ExitAgents.ElementsAs(ctx, story.ExitAgents, false)
+		if diags.HasError() {
+			return
+		}
+	}
+
+	if !plan.TeamID.IsNull() && !plan.TeamID.IsUnknown() {
+		story.TeamID = plan.TeamID.ValueInt64()
+	}
+
+	if !plan.FolderID.IsNull() && !plan.FolderID.IsUnknown() {
+		story.FolderID = plan.FolderID.ValueInt64()
 	}
 
 	return diags
@@ -752,11 +802,14 @@ func (r *storyResource) runImportStory(plan *storyResourceModel) (story *tines_c
 	}
 
 	var importRequest = tines_cli.StoryImportRequest{
-		NewName:  name,
-		Data:     data,
-		TeamID:   plan.TeamID.ValueInt64(),
-		FolderID: plan.FolderID.ValueInt64(),
-		Mode:     "versionReplace",
+		NewName: name,
+		Data:    data,
+		TeamID:  plan.TeamID.ValueInt64(),
+		Mode:    "versionReplace",
+	}
+
+	if !plan.FolderID.IsNull() && !plan.FolderID.IsUnknown() {
+		importRequest.FolderID = plan.FolderID.ValueInt64()
 	}
 
 	story, err = r.client.ImportStory(&importRequest)

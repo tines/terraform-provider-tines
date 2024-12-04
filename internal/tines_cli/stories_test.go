@@ -55,11 +55,11 @@ func TestImportStory(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	tenant := &ts.URL
+	tenant := ts.URL
 	apiKey := "foo"
 	version := "test"
 
-	c, err := NewClient(tenant, &apiKey, &version)
+	c, err := NewClient(tenant, apiKey, version)
 
 	assert.Nil(err, "should instantiate the Tines API client without errors")
 

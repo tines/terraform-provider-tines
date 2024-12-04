@@ -44,10 +44,10 @@ type Story struct {
 }
 
 // Create a new story.
-func (c *Client) CreateStory(new *Story) (*Story, error) {
+func (c *Client) CreateStory(s *Story) (*Story, error) {
 	newStory := Story{}
 
-	req, err := json.Marshal(&new)
+	req, err := json.Marshal(&s)
 	if err != nil {
 		return nil, err
 	}

@@ -632,6 +632,14 @@ func (r *storyResource) UpgradeState(ctx context.Context) map[int64]resource.Sta
 					Data:          priorStateData.Data,
 					TinesApiToken: priorStateData.TinesApiToken,
 					TenantUrl:     priorStateData.TenantUrl,
+					// Because the underlying type for each of these values in the
+					// struct is a List, and Terraform requires Lists to have values
+					// of an explicit type in the schema, we set these values to a
+					// typed null value so Terraform doesn't panic.
+					SharedTeamSlugs: types.ListNull(types.StringType),
+					ExitAgents:      types.ListNull(types.Int64Type),
+					Owners:          types.ListNull(types.Int64Type),
+					Tags:            types.ListNull(types.StringType),
 				}
 
 				if !priorStateData.FolderID.IsNull() {

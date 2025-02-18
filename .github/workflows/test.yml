@@ -86,7 +86,7 @@ jobs:
       - run: go mod download
       - env:
           TF_ACC: "1"
-          TINES_TENANT: ${{ secrets.TestTinesTenant }}
-          TINES_API_KEY: ${{ secrets.TestTinesApiKey }}
+          TINES_TENANT: ${{ secrets.TEST_TINES_TENANT }}
+          TINES_API_KEY: ${{ secrets.TEST_TINES_API_KEY }}
         run: go test -v -cover ./internal/provider/
         timeout-minutes: 10

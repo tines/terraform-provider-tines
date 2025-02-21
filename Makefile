@@ -19,17 +19,17 @@ lintfix:
 .PHONY: install
 install:
 	brew install golangci-lint
-	brew install terraform
+	brew tap hashicorp/tap
+	brew install hashicorp/tap/terraform
 	go install golang.org/x/tools/gopls@latest
-	go get github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
+	go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@latest
 
 # Generate docs
 .PHONY: docs
 docs:
-	go get github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
-	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
+	go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@latest
 
 # Run local install
 .PHONY: install-local
-install:
+install-local:
 	go install

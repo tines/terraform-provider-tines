@@ -33,7 +33,3 @@ website/vendor
 
 # Keep windows files with windows line endings
 *.winfile eol=crlf
-
-test-story.json
-dev-story.json
-prod-story.json

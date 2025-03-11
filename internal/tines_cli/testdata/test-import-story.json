@@ -1,0 +1,105 @@
+{
+    "schema_version": 23,
+    "standard_lib_version": 63,
+    "action_runtime_version": 15,
+    "name": "Test Story",
+    "description": null,
+    "guid": "3ef721e341e953727b057d4bd7bd65eb",
+    "slug": "test_story",
+    "agents": [
+      {
+        "type": "Agents::WebhookAgent",
+        "name": "Webhook Action",
+        "disabled": false,
+        "description": null,
+        "guid": "7977a7af73df9e18234ae8acb814d4fa",
+        "origin_story_identifier": "cloud:8eeb4fdfeb8e2a573e55856936a8cf7f:3ef721e341e953727b057d4bd7bd65eb",
+        "options": {
+          "path": "2a5b9cd5b43d06329fd72f70c7cbeede",
+          "secret": "cf881382af21ef97840c36aa9391f6cc",
+          "verbs": "get,post"
+        },
+        "reporting": {
+          "time_saved_value": 0,
+          "time_saved_unit": "minutes"
+        },
+        "monitoring": {
+          "monitor_all_events": false,
+          "monitor_failures": false,
+          "monitor_no_events_emitted": null
+        },
+        "template": {
+          "created_from_template_guid": null,
+          "created_from_template_version": null,
+          "template_tags": []
+        },
+        "width": null
+      },
+      {
+        "type": "Agents::EventTransformationAgent",
+        "name": "Event Transform Action",
+        "disabled": false,
+        "description": null,
+        "guid": "6bba07417c1732ae4b2e7b642dcc9cea",
+        "origin_story_identifier": "cloud:8eeb4fdfeb8e2a573e55856936a8cf7f:3ef721e341e953727b057d4bd7bd65eb",
+        "options": {
+          "mode": "message_only",
+          "loop": false,
+          "payload": {
+            "message": "This is an automatically generated message from Tines"
+          }
+        },
+        "reporting": {
+          "time_saved_value": 0,
+          "time_saved_unit": "minutes"
+        },
+        "monitoring": {
+          "monitor_all_events": false,
+          "monitor_failures": false,
+          "monitor_no_events_emitted": null
+        },
+        "template": {
+          "created_from_template_guid": null,
+          "created_from_template_version": null,
+          "template_tags": []
+        },
+        "width": null,
+        "schedule": null
+      }
+    ],
+    "diagram_notes": [],
+    "links": [
+      {
+        "source": 0,
+        "receiver": 1
+      }
+    ],
+    "diagram_layout": "{\"7977a7af73df9e18234ae8acb814d4fa\":[360,135],\"6bba07417c1732ae4b2e7b642dcc9cea\":[360,240]}",
+    "send_to_story_enabled": false,
+    "entry_agent_guid": null,
+    "exit_agent_guids": [],
+    "exit_agent_guid": null,
+    "api_entry_action_guids": [],
+    "api_exit_action_guids": [],
+    "keep_events_for": 86400,
+    "reporting_status": true,
+    "send_to_story_access": null,
+    "story_library_metadata": {},
+    "parent_only_send_to_story": false,
+    "monitor_failures": false,
+    "send_to_stories": [],
+    "synchronous_webhooks_enabled": false,
+    "send_to_story_access_source": 0,
+    "send_to_story_skill_use_requires_confirmation": true,
+    "pages": [],
+    "tags": [],
+    "time_saved_unit": "minutes",
+    "time_saved_value": 0,
+    "origin_story_identifier": "cloud:8eeb4fdfeb8e2a573e55856936a8cf7f:3ef721e341e953727b057d4bd7bd65eb",
+    "integration_product": null,
+    "integration_vendor": null,
+    "llm_product_instructions": "",
+    "exported_at": "2024-11-04T23:05:20Z",
+    "icon": ":house_buildings:",
+    "integrations": []
+  }

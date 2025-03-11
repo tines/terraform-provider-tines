@@ -1,132 +1,211 @@
 package provider
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-	"net/http/httptest"
-	"os"
+	"regexp"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
 	"github.com/hashicorp/terraform-plugin-testing/plancheck"
-	"github.com/stretchr/testify/assert"
+	"github.com/hashicorp/terraform-plugin-testing/statecheck"
+	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
-var (
-	testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-		"tines": providerserver.NewProtocol6WithError(New("test")()),
-	}
-)
-
-func TestStoryResourceCreate(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "DELETE" {
-			w.WriteHeader(204)
-			return
-		} else {
-			f, err := os.Open("testdata/imported_story.json")
-			assert.Nil(t, err)
-
-			defer f.Close()
-			_, cErr := io.Copy(w, f)
-			assert.Nil(t, cErr)
-
-			var data StoryImportRequest
-			body, err := io.ReadAll(r.Body)
-			assert.Nil(t, err)
-			err = json.Unmarshal(body, &data)
-			assert.Nil(t, err)
-
-			assert.Equal(t, data.NewName, "Simple story")
-			assert.Equal(t, data.TeamID, int64(2))
-			assert.Equal(t, data.FolderID, int64(1))
-			assert.Equal(t, data.Mode, "versionReplace")
-		}
-	}))
-	defer ts.Close()
-	resourceConfig := `provider "tines" {}
-		resource "tines_story" "test" {
-			data 			= file("./testdata/test_story.json")
-			tenant_url      = "%s"
-			tines_api_token = "dummyToken"
-			team_id 				= 2
-			folder_id 			= 1
-		}
-	`
-	resourceConfig = fmt.Sprintf(resourceConfig, ts.URL)
-
+func TestAccTinesStory_fromExportNoFolder(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: resourceConfig,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("tines_story.test", "id", "2"),
-				),
+				Config: providerConfig + testAccCreateImportStoryResourceNoFolder(),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectNonEmptyPlan(),
+						plancheck.ExpectUnknownValue(
+							"tines_story.test_create_from_export_no_folder",
+							tfjsonpath.New("id"),
+						),
+						plancheck.ExpectUnknownValue(
+							"tines_story.test_create_from_export_no_folder",
+							tfjsonpath.New("folder_id"),
+						),
+						plancheck.ExpectKnownValue(
+							"tines_story.test_create_from_export_no_folder",
+							tfjsonpath.New("team_id"),
+							knownvalue.Int64Exact(30906),
+						),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(
+						"tines_story.test_create_from_export_no_folder",
+						tfjsonpath.New("id"),
+						knownvalue.NotNull(),
+					),
+					statecheck.ExpectKnownValue(
+						"tines_story.test_create_from_export_no_folder",
+						tfjsonpath.New("name"),
+						knownvalue.StringExact("Test Story"),
+					),
+				},
+			},
+			{
+				RefreshState: true,
+			},
+			{
+				Config: providerConfig + testAccUpdateImportStoryResourceNoFolder(),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectNonEmptyPlan(),
+						plancheck.ExpectResourceAction("tines_story.test_create_from_export_no_folder", plancheck.ResourceActionUpdate),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(
+						"tines_story.test_create_from_export_no_folder",
+						tfjsonpath.New("team_id"),
+						knownvalue.Int64Exact(32987),
+					),
+				},
 			},
 		},
 	})
 }
 
-func TestStoryUpdateInPlace(t *testing.T) {
-	t.Parallel()
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "DELETE" {
-			w.WriteHeader(204)
-			return
-		} else {
-			f, err := os.Open("testdata/imported_story.json")
-			assert.Nil(t, err)
-
-			defer f.Close()
-			_, cErr := io.Copy(w, f)
-			assert.Nil(t, cErr)
-
-			var data StoryImportRequest
-			body, err := io.ReadAll(r.Body)
-			assert.Nil(t, err)
-			err = json.Unmarshal(body, &data)
-			assert.Nil(t, err)
-
-			assert.Equal(t, data.TeamID, int64(2))
-			assert.Equal(t, data.FolderID, int64(1))
-			assert.Equal(t, data.Mode, "versionReplace")
-		}
-	}))
-	defer ts.Close()
-	resourceConfig := `
-		provider "tines" {}
-		resource "tines_story" "test" {
-			data 						= file("%s")
-			tenant_url      = "%s"
-			tines_api_token = "dummyToken"
-			team_id 				= 2
-			folder_id 			= 1
-		}
-	`
-
-	resourceConfigOne := fmt.Sprintf(resourceConfig, "./testdata/test_story.json", ts.URL)
-	resourceConfigTwo := fmt.Sprintf(resourceConfig, "./testdata/test_story_update_in_place.json", ts.URL)
-
+func TestAccTinesStory_fromExportWithFolder(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: resourceConfigOne,
-			},
-			{
-				Config: resourceConfigTwo,
+				Config: providerConfig + testAccCreateImportStoryResourceWithFolder(),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectResourceAction("tines_story.test", plancheck.ResourceActionUpdate),
+						plancheck.ExpectNonEmptyPlan(),
+						plancheck.ExpectUnknownValue(
+							"tines_story.test_create_from_export_with_folder",
+							tfjsonpath.New("id"),
+						),
+						plancheck.ExpectKnownValue(
+							"tines_story.test_create_from_export_with_folder",
+							tfjsonpath.New("team_id"),
+							knownvalue.Int64Exact(30906),
+						),
+						plancheck.ExpectKnownValue(
+							"tines_story.test_create_from_export_with_folder",
+							tfjsonpath.New("folder_id"),
+							knownvalue.Int64Exact(7993),
+						),
 					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(
+						"tines_story.test_create_from_export_with_folder",
+						tfjsonpath.New("id"),
+						knownvalue.NotNull(),
+					),
+					statecheck.ExpectKnownValue(
+						"tines_story.test_create_from_export_with_folder",
+						tfjsonpath.New("name"),
+						knownvalue.StringExact("Test Story"),
+					),
+					statecheck.ExpectKnownValue(
+						"tines_story.test_create_from_export_with_folder",
+						tfjsonpath.New("folder_id"),
+						knownvalue.Int64Exact(7993),
+					),
 				},
 			},
 		},
 	})
+}
+
+func TestAccTinesStory_fromConfigNoFolder(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      providerConfig + testAccCreateConfigStoryResourceBadConfig(),
+				ExpectError: regexp.MustCompile("Attribute \"data\" cannot be specified when \"name\" is specified"),
+			},
+			{
+				Config: providerConfig + testAccCreateConfigStoryResourceOneStep(),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectNonEmptyPlan(),
+					},
+				},
+			},
+			{
+				Config: providerConfig + testAccCreateConfigStoryResourceMultiStep(),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectNonEmptyPlan(),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(
+						"tines_story.test_create_multi_step",
+						tfjsonpath.New("change_control_enabled"),
+						knownvalue.Bool(true),
+					),
+				},
+			},
+		},
+	})
+}
+
+func testAccCreateImportStoryResourceNoFolder() string {
+	return `
+resource "tines_story" "test_create_from_export_no_folder" {
+	data = file("${path.module}/testdata/test-story.json")
+	team_id = 30906
+}
+	`
+}
+
+func testAccUpdateImportStoryResourceNoFolder() string {
+	return `
+resource "tines_story" "test_create_from_export_no_folder" {
+	data = file("${path.module}/testdata/test-story.json")
+	team_id = 32987
+}
+	`
+}
+
+func testAccCreateImportStoryResourceWithFolder() string {
+	return `
+resource "tines_story" "test_create_from_export_with_folder" {
+	data = file("${path.module}/testdata/test-story.json")
+	team_id = 30906
+	folder_id = 7993
+}
+	`
+}
+
+func testAccCreateConfigStoryResourceBadConfig() string {
+	return `
+resource "tines_story" "test_create_invalid" {
+	data = file("${path.module}/testdata/test-story.json")
+	team_id = 30906
+	name = "Example Bad Config"
+}
+	`
+}
+
+func testAccCreateConfigStoryResourceOneStep() string {
+	return `
+resource "tines_story" "test_create_one_step" {
+	team_id = 30906
+	name = "Example One Step"
+}
+	`
+}
+
+func testAccCreateConfigStoryResourceMultiStep() string {
+	return `
+resource "tines_story" "test_create_multi_step" {
+	team_id = 30906
+	name = "Example Multi Step"
+	change_control_enabled = true
+}
+	`
 }

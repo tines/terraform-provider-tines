@@ -105,7 +105,7 @@ func TestAccTinesStory_fromExportWithFolder(t *testing.T) {
 					statecheck.ExpectKnownValue(
 						"tines_story.test_create_from_export_with_folder",
 						tfjsonpath.New("name"),
-						knownvalue.StringExact("Test Story"),
+						knownvalue.StringExact("Test Story 2"),
 					),
 					statecheck.ExpectKnownValue(
 						"tines_story.test_create_from_export_with_folder",

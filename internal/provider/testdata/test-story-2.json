@@ -2,20 +2,20 @@
     "schema_version": 23,
     "standard_lib_version": 63,
     "action_runtime_version": 15,
-    "name": "Test Story",
+    "name": "Test Story 2",
     "description": null,
-    "guid": "3ef721e341e953727b057d4bd7bd65eb",
-    "slug": "test_story",
+    "guid": "3ef721e341e953727b057d4bd7bd65ed",
+    "slug": "test_story_2",
     "agents": [
       {
         "type": "Agents::WebhookAgent",
         "name": "Webhook Action",
         "disabled": false,
         "description": null,
-        "guid": "7977a7af73df9e18234ae8acb814d4fa",
-        "origin_story_identifier": "cloud:8eeb4fdfeb8e2a573e55856936a8cf7f:3ef721e341e953727b057d4bd7bd65eb",
+        "guid": "7977a7af73df9e18234ae8acb814d4fb",
+        "origin_story_identifier": "cloud:8eeb4fdfeb8e2a573e55856936a8cf7f:3ef721e341e953727b057d4bd7bd65ed",
         "options": {
-          "path": "2a5b9cd5b43d06329fd72f70c7cbeede",
+          "path": "2a5b9cd5b43d06329fd72f70c7cbeedf",
           "secret": "cf881382af21ef97840c36aa9391f6cc",
           "verbs": "get,post"
         },
@@ -40,8 +40,8 @@
         "name": "Event Transform Action",
         "disabled": false,
         "description": null,
-        "guid": "6bba07417c1732ae4b2e7b642dcc9cea",
-        "origin_story_identifier": "cloud:8eeb4fdfeb8e2a573e55856936a8cf7f:3ef721e341e953727b057d4bd7bd65eb",
+        "guid": "6bba07417c1732ae4b2e7b642dcc9cec",
+        "origin_story_identifier": "cloud:8eeb4fdfeb8e2a573e55856936a8cf7f:3ef721e341e953727b057d4bd7bd65ed",
         "options": {
           "mode": "message_only",
           "loop": false,
@@ -74,7 +74,7 @@
         "receiver": 1
       }
     ],
-    "diagram_layout": "{\"7977a7af73df9e18234ae8acb814d4fa\":[360,135],\"6bba07417c1732ae4b2e7b642dcc9cea\":[360,240]}",
+    "diagram_layout": "{\"7977a7af73df9e18234ae8acb814d4fb\":[360,135],\"6bba07417c1732ae4b2e7b642dcc9cec\":[360,240]}",
     "send_to_story_enabled": false,
     "entry_agent_guid": null,
     "exit_agent_guids": [],
@@ -95,7 +95,7 @@
     "tags": [],
     "time_saved_unit": "minutes",
     "time_saved_value": 0,
-    "origin_story_identifier": "cloud:8eeb4fdfeb8e2a573e55856936a8cf7f:3ef721e341e953727b057d4bd7bd65eb",
+    "origin_story_identifier": "cloud:8eeb4fdfeb8e2a573e55856936a8cf7f:3ef721e341e953727b057d4bd7bd65ed",
     "integration_product": null,
     "integration_vendor": null,
     "llm_product_instructions": "",

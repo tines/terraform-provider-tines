@@ -174,7 +174,7 @@ resource "tines_story" "test_create_from_export_no_folder" {
 func testAccCreateImportStoryResourceWithFolder() string {
 	return `
 resource "tines_story" "test_create_from_export_with_folder" {
-	data = file("${path.module}/testdata/test-story.json")
+	data = file("${path.module}/testdata/test-story-2.json")
 	team_id = 30906
 	folder_id = 7993
 }

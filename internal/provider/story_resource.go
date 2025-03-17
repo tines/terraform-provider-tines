@@ -20,12 +20,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/tines/terraform-provider-tines/internal/tines_cli"
+	"github.com/tines/go-sdk/tines"
 )
 
 // storyResource is the resource implementation.
 type storyResource struct {
-	client *tines_cli.Client
+	client *tines.Client
 }
 
 // Prior schema data to enable upgrade of existing tfstate files to
@@ -317,7 +317,7 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 	tflog.Info(ctx, "Creating Story")
 
 	var plan storyResourceModel
-	var story *tines_cli.Story
+	var story *tines.Story
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -326,7 +326,7 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 	if !plan.Data.IsNull() {
 		tflog.Info(ctx, "Exported Story payload detected, using the Import strategy")
-		story, diags = r.runImportStory(&plan)
+		story, diags = r.runImportStory(ctx, &plan)
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {
 			return
@@ -336,7 +336,7 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 		// Some fields cannot be set at creation time, and require a subsequent update to the Story
 		// in order to be set properly.
 		var requiresUpdate bool
-		var updateStory tines_cli.Story
+		var updateStory tines.Story
 		var err error
 
 		// Checking for both null and unknown ensures that we're only setting the value
@@ -375,8 +375,8 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 		}
 
 		// Create the new story first, so we have something to update if needed.
-		newStory := tines_cli.Story{
-			TeamID: plan.TeamID.ValueInt64(),
+		newStory := tines.Story{
+			TeamID: int(plan.TeamID.ValueInt64()),
 		}
 
 		// Iterate through our optional values to ensure we're only setting parameters
@@ -393,11 +393,11 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 		}
 
 		if !plan.KeepEventsFor.IsNull() && !plan.KeepEventsFor.IsUnknown() {
-			newStory.KeepEventsFor = plan.KeepEventsFor.ValueInt64()
+			newStory.KeepEventsFor = int(plan.KeepEventsFor.ValueInt64())
 		}
 
 		if !plan.FolderID.IsNull() && !plan.FolderID.IsUnknown() {
-			newStory.FolderID = plan.FolderID.ValueInt64()
+			newStory.FolderID = int(plan.FolderID.ValueInt64())
 		}
 
 		if !plan.Tags.IsNull() && !plan.Tags.IsUnknown() {
@@ -416,7 +416,7 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 			newStory.Priority = plan.Priority.ValueBool()
 		}
 
-		story, err = r.client.CreateStory(&newStory)
+		story, err = r.client.CreateStory(ctx, &newStory)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error Creating Tines Story",
@@ -430,7 +430,7 @@ func (r *storyResource) Create(ctx context.Context, req resource.CreateRequest, 
 		// We're not worried about overwriting the story ID value here because it won't change.
 		if requiresUpdate {
 			tflog.Info(ctx, "Some fields present require an additional update to the Story for the values to be set, running Story Update.")
-			story, err = r.client.UpdateStory(story.ID, &updateStory)
+			story, err = r.client.UpdateStory(ctx, story.ID, &updateStory)
 			if err != nil {
 				resp.Diagnostics.AddError(
 					"Error Updating Tines Story",
@@ -467,11 +467,11 @@ func (r *storyResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		return
 	}
 
-	remoteState, err := r.client.GetStory(localState.ID.ValueInt64())
+	remoteState, err := r.client.GetStory(ctx, int(localState.ID.ValueInt64()))
 	if err != nil {
 		// Treat HTTP 404 Not Found status as a signal to recreate resource
 		// and return early.
-		if tinesErr, ok := err.(tines_cli.Error); ok {
+		if tinesErr, ok := err.(tines.Error); ok {
 			if tinesErr.StatusCode == 404 {
 				resp.State.RemoveResource(ctx)
 				return
@@ -506,7 +506,7 @@ func (r *storyResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	tflog.Info(ctx, "Updating Story")
 
 	var plan, state storyResourceModel
-	var story *tines_cli.Story
+	var story *tines.Story
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -520,20 +520,20 @@ func (r *storyResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	if !plan.Data.IsNull() && !plan.Data.Equal(state.Data) {
 		tflog.Info(ctx, "Exported Story payload detected, using the Import strategy")
-		story, diags = r.runImportStory(&plan)
+		story, diags = r.runImportStory(ctx, &plan)
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {
 			return
 		}
 	} else {
-		var storyUpdate tines_cli.Story
+		var storyUpdate tines.Story
 		var err error
 		diags = r.convertPlanToStory(ctx, &plan, &storyUpdate)
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {
 			return
 		}
-		story, err = r.client.UpdateStory(plan.ID.ValueInt64(), &storyUpdate)
+		story, err = r.client.UpdateStory(ctx, int(plan.ID.ValueInt64()), &storyUpdate)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error Deleting Tines Story",
@@ -569,7 +569,7 @@ func (r *storyResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 	}
 
 	// Delete existing story.
-	err := r.client.DeleteStory(state.ID.ValueInt64())
+	err := r.client.DeleteStory(ctx, int(state.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Deleting Tines Story",
@@ -659,12 +659,12 @@ func (r *storyResource) Configure(_ context.Context, req resource.ConfigureReque
 		return
 	}
 
-	client, ok := req.ProviderData.(*tines_cli.Client)
+	client, ok := req.ProviderData.(*tines.Client)
 
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Tines Client Configure Type",
-			fmt.Sprintf("Expected *tines_cli.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *tines.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -673,7 +673,7 @@ func (r *storyResource) Configure(_ context.Context, req resource.ConfigureReque
 	r.client = client
 }
 
-func (r *storyResource) convertPlanToStory(ctx context.Context, plan *storyResourceModel, story *tines_cli.Story) (diags diag.Diagnostics) {
+func (r *storyResource) convertPlanToStory(ctx context.Context, plan *storyResourceModel, story *tines.Story) (diags diag.Diagnostics) {
 	if !plan.Name.IsNull() && !plan.Name.IsUnknown() {
 		story.Name = plan.Name.ValueString()
 	}
@@ -683,7 +683,7 @@ func (r *storyResource) convertPlanToStory(ctx context.Context, plan *storyResou
 	}
 
 	if !plan.KeepEventsFor.IsNull() && !plan.KeepEventsFor.IsUnknown() {
-		story.KeepEventsFor = plan.KeepEventsFor.ValueInt64()
+		story.KeepEventsFor = int(plan.KeepEventsFor.ValueInt64())
 	}
 
 	if !plan.Disabled.IsNull() && !plan.Disabled.IsUnknown() {
@@ -722,7 +722,7 @@ func (r *storyResource) convertPlanToStory(ctx context.Context, plan *storyResou
 	}
 
 	if !plan.EntryAgentID.IsNull() && !plan.EntryAgentID.IsUnknown() {
-		story.EntryAgentID = plan.EntryAgentID.ValueInt64()
+		story.EntryAgentID = int(plan.EntryAgentID.ValueInt64())
 	}
 
 	if !plan.ExitAgents.IsNull() && !plan.ExitAgents.IsUnknown() {
@@ -733,25 +733,25 @@ func (r *storyResource) convertPlanToStory(ctx context.Context, plan *storyResou
 	}
 
 	if !plan.TeamID.IsNull() && !plan.TeamID.IsUnknown() {
-		story.TeamID = plan.TeamID.ValueInt64()
+		story.TeamID = int(plan.TeamID.ValueInt64())
 	}
 
 	if !plan.FolderID.IsNull() && !plan.FolderID.IsUnknown() {
-		story.FolderID = plan.FolderID.ValueInt64()
+		story.FolderID = int(plan.FolderID.ValueInt64())
 	}
 
 	return diags
 }
 
 // This is reused in both the Create and Update methods.
-func (r *storyResource) convertStoryToPlan(ctx context.Context, plan *storyResourceModel, story *tines_cli.Story) (diags diag.Diagnostics) {
+func (r *storyResource) convertStoryToPlan(ctx context.Context, plan *storyResourceModel, story *tines.Story) (diags diag.Diagnostics) {
 	// Populate all the computed values in the plan.
 
-	plan.ID = types.Int64Value(story.ID)
+	plan.ID = types.Int64Value(int64(story.ID))
 	plan.Name = types.StringValue(story.Name)
-	plan.UserID = types.Int64Value(story.UserID)
+	plan.UserID = types.Int64Value(int64(story.UserID))
 	plan.Description = types.StringValue(story.Description)
-	plan.KeepEventsFor = types.Int64Value(story.KeepEventsFor)
+	plan.KeepEventsFor = types.Int64Value(int64(story.KeepEventsFor))
 	plan.Disabled = types.BoolValue(story.Disabled)
 	plan.Priority = types.BoolValue(story.Priority)
 	plan.STSEnabled = types.BoolValue(story.STSEnabled)
@@ -762,12 +762,12 @@ func (r *storyResource) convertStoryToPlan(ctx context.Context, plan *storyResou
 	if diags.HasError() {
 		return diags
 	}
-	plan.EntryAgentID = types.Int64Value(story.EntryAgentID)
+	plan.EntryAgentID = types.Int64Value(int64(story.EntryAgentID))
 	plan.ExitAgents, diags = types.ListValueFrom(ctx, types.Int64Type, story.ExitAgents)
 	if diags.HasError() {
 		return diags
 	}
-	plan.TeamID = types.Int64Value(story.TeamID)
+	plan.TeamID = types.Int64Value(int64(story.TeamID))
 	plan.Tags, diags = types.ListValueFrom(ctx, types.StringType, story.Tags)
 	if diags.HasError() {
 		return diags
@@ -777,7 +777,7 @@ func (r *storyResource) convertStoryToPlan(ctx context.Context, plan *storyResou
 	plan.CreatedAt = types.StringValue(story.CreatedAt)
 	plan.EditedAt = types.StringValue(story.EditedAt)
 	plan.Mode = types.StringValue(story.Mode)
-	plan.FolderID = types.Int64Value(story.FolderID)
+	plan.FolderID = types.Int64Value(int64(story.FolderID))
 	plan.Published = types.BoolValue(story.Published)
 	plan.ChangeControlEnabled = types.BoolValue(story.ChangeControlEnabled)
 	plan.Locked = types.BoolValue(story.Locked)
@@ -792,7 +792,7 @@ func (r *storyResource) convertStoryToPlan(ctx context.Context, plan *storyResou
 
 // This is reused in both the Create and Update methods when the resource management strategy is set to use
 // imported stories to override all values.
-func (r *storyResource) runImportStory(plan *storyResourceModel) (story *tines_cli.Story, diags diag.Diagnostics) {
+func (r *storyResource) runImportStory(ctx context.Context, plan *storyResourceModel) (story *tines.Story, diags diag.Diagnostics) {
 	var data map[string]interface{}
 
 	encData := plan.Data.ValueString()
@@ -809,18 +809,18 @@ func (r *storyResource) runImportStory(plan *storyResourceModel) (story *tines_c
 		return
 	}
 
-	var importRequest = tines_cli.StoryImportRequest{
+	var importRequest = tines.StoryImportRequest{
 		NewName: name,
 		Data:    data,
-		TeamID:  plan.TeamID.ValueInt64(),
+		TeamID:  int(plan.TeamID.ValueInt64()),
 		Mode:    "versionReplace",
 	}
 
 	if !plan.FolderID.IsNull() && !plan.FolderID.IsUnknown() {
-		importRequest.FolderID = plan.FolderID.ValueInt64()
+		importRequest.FolderID = int(plan.FolderID.ValueInt64())
 	}
 
-	story, err = r.client.ImportStory(&importRequest)
+	story, err = r.client.ImportStory(ctx, &importRequest)
 	if err != nil {
 		diags.AddError(
 			"Error Importing Tines Story",

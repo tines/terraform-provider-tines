@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"regexp"
 
@@ -14,7 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/tines/terraform-provider-tines/internal/tines_cli"
+	"github.com/tines/go-sdk/tines"
 )
 
 // Ensure TinesProvider satisfies various provider interfaces.
@@ -129,7 +130,11 @@ func (p *TinesProvider) Configure(ctx context.Context, req provider.ConfigureReq
 	}
 
 	// Create a new Tines client using the configuration values.
-	c, err := tines_cli.NewClient(tenant, apiKey, p.version)
+	c, err := tines.NewClient(
+		tines.SetTenantUrl(tenant),
+		tines.SetApiKey(apiKey),
+		tines.SetUserAgent(fmt.Sprintf("Tines/TerraformProvider (%s)", p.version)),
+	)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to Create Tines API Client",

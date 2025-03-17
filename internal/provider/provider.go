@@ -133,7 +133,7 @@ func (p *TinesProvider) Configure(ctx context.Context, req provider.ConfigureReq
 	c, err := tines.NewClient(
 		tines.SetTenantUrl(tenant),
 		tines.SetApiKey(apiKey),
-		tines.SetUserAgent(fmt.Sprintf("Tines/TerraformProvider-%s", p.version)),
+		tines.SetUserAgent(fmt.Sprintf("Tines/TerraformProvider (%s)", p.version)),
 	)
 	if err != nil {
 		resp.Diagnostics.AddError(

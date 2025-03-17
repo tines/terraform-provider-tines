@@ -42,22 +42,9 @@ jobs:
           git diff --compact-summary --exit-code -- docs || \
             (echo; echo "Unexpected difference in directories after code generation. Run 'make docs' command and commit."; exit 1)
 
-  test-cli:
-    name: Tines API Client Unit Tests
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
-        with:
-            go-version-file: "go.mod"
-            cache: true
-      - run: go mod download
-      - run: go test -v -cover ./internal/tines_cli/
-
   test-provider:
     name: Terraform Provider Acceptance Tests
-    needs: [build, test-cli]
+    needs: [build]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:

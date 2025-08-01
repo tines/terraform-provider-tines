@@ -157,6 +157,7 @@ func (p *TinesProvider) Configure(ctx context.Context, req provider.ConfigureReq
 func (p *TinesProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewStoryResource,
+		NewTinesResource,
 	}
 }
 

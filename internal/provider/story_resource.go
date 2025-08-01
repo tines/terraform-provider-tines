@@ -536,8 +536,8 @@ func (r *storyResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		story, err = r.client.UpdateStory(ctx, int(plan.ID.ValueInt64()), &storyUpdate)
 		if err != nil {
 			resp.Diagnostics.AddError(
-				"Error Deleting Tines Story",
-				"Could not delete story, unexpected error: "+err.Error(),
+				"Error Updating Tines Story",
+				"Could not update story, unexpected error: "+err.Error(),
 			)
 			return
 		}

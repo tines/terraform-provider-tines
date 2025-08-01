@@ -229,7 +229,7 @@ func (r *tinesResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 	// Add optional attributes to the new Tines Resource if they have been set.
 	if !plan.FolderId.IsNull() && !plan.FolderId.IsUnknown() {
-		newResource.FolderId = int(plan.Id.ValueInt64())
+		newResource.FolderId = int(plan.FolderId.ValueInt64())
 	}
 
 	if !plan.ReadAccess.IsNull() && !plan.ReadAccess.IsUnknown() {

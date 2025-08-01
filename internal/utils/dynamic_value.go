@@ -174,7 +174,7 @@ func SetUnderlyingDynamicValue(ctx context.Context, jsonValue string) (types.Dyn
 	return dynamicValue, diags
 }
 
-// convertToTerraformValue recursively converts a parsed JSON value to a Terraform dynamic value
+// convertToTerraformValue recursively converts a parsed JSON value to a Terraform dynamic value.
 func convertToTerraformValue(ctx context.Context, value any) (types.Dynamic, diag.Diagnostics) {
 	var diags diag.Diagnostics
 

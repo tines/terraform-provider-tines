@@ -521,7 +521,8 @@ func (r *tinesResource) convertTinesResourceToPlan(ctx context.Context, plan *ti
 	// the production value.
 	plan.Id = types.Int64Value(int64(tr.Id))
 	plan.Name = types.StringValue(tr.Name)
-	plan.Value, diags = utils.SetUnderlyingDynamicValue(ctx, tr.Value.(string))
+	val, _ := tr.Value.(string)
+	plan.Value, diags = utils.SetUnderlyingDynamicValue(ctx, val)
 	if diags.HasError() {
 		return diags
 	}
@@ -539,8 +540,9 @@ func (r *tinesResource) convertTinesResourceToPlan(ctx context.Context, plan *ti
 	// Set the computed value of TestResource to nil if one is not enabled - the Tines
 	// API won't return a value for test_resource if one is not enabled.
 	if tr.TestResource != nil {
-		val, _ := tr.TestResource.(map[string]any)
-		plan.TestResource, diags = utils.SetUnderlyingDynamicValue(ctx, val["value"].(string))
+		testres, _ := tr.TestResource.(map[string]any)
+		testval, _ := testres["value"].(string)
+		plan.TestResource, diags = utils.SetUnderlyingDynamicValue(ctx, testval)
 		if diags.HasError() {
 			return diags
 		}

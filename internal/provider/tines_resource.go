@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/boolvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/dynamicvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -164,15 +166,22 @@ func (r *tinesResource) Schema(ctx context.Context, _ resource.SchemaRequest, re
 				Optional:    true,
 				Validators: []validator.Dynamic{
 					dynamicvalidator.AlsoRequires(path.MatchRoot("test_resource_enabled")),
+					dynamicvalidator.ConflictsWith(path.MatchRoot("live_resource_id"), path.MatchRoot("is_test")),
 				},
 			},
 			"is_test": schema.BoolAttribute{
 				Description: "Boolean flag indicating whether the Tines Resource production or test value should be updated.",
 				Optional:    true,
+				Validators: []validator.Bool{
+					boolvalidator.AlsoRequires(path.MatchRoot("test_resource_enabled")),
+				},
 			},
 			"live_resource_id": schema.Int64Attribute{
 				Description: "Optional when updating a test Tines Resource value.",
 				Optional:    true,
+				Validators: []validator.Int64{
+					int64validator.AlsoRequires(path.MatchRoot("test_resource_enabled")),
+				},
 			},
 			"referencing_action_ids": schema.ListAttribute{
 				Description: "A list of Action IDs in Tines Stories that reference this Tines Resource value. This Resource should not be removed if this is non-null.",
@@ -198,6 +207,7 @@ func (r *tinesResource) Schema(ctx context.Context, _ resource.SchemaRequest, re
 func (r *tinesResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	tflog.Info(ctx, "Creating Tines Resource")
 	var plan tinesResourceModel
+	var updateRequired bool
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -235,7 +245,7 @@ func (r *tinesResource) Create(ctx context.Context, req resource.CreateRequest, 
 	}
 
 	if !plan.TestEnabled.IsNull() && !plan.TestEnabled.IsUnknown() {
-		newResource.TestResEnabled = plan.TestEnabled.ValueBool()
+		updateRequired = true
 	}
 
 	// Create the Tines Resource. The API does not permit creating a Tines Resource with an associated
@@ -252,24 +262,22 @@ func (r *tinesResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 	// Check and see if there is a test value associated with this Tines Resource, and add it to the
 	// parent resource if so.
-	updateRequired := false
 	updatedResource := tines.Resource{
-		Id:           tr.Id,
-		TestResource: true,
-	}
-
-	if !plan.TestEnabled.IsNull() && !plan.TestEnabled.IsUnknown() {
-		updatedResource.TestResEnabled = plan.TestEnabled.ValueBool()
-		updateRequired = true
+		Name:           "update", // This value gets thrown away by the API.
+		TeamId:         tr.TeamId,
+		LiveResourceId: tr.Id,
 	}
 
 	if !plan.TestValue.IsNull() && !plan.TestValue.IsUnknown() {
-		updatedResource.Value = plan.TestValue.UnderlyingValue()
-		updateRequired = true
+		updatedResource.Value, diags = utils.GetUnderlyingDynamicValue(ctx, &plan.TestValue)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	if updateRequired {
-		tr, err = r.client.UpdateResource(ctx, updatedResource.Id, &updatedResource)
+		tr, err = r.client.CreateResource(ctx, &updatedResource)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error Adding Test Tines Resource",
@@ -342,7 +350,7 @@ func (r *tinesResource) Read(ctx context.Context, req resource.ReadRequest, resp
 func (r *tinesResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	tflog.Info(ctx, "Updating Tines Resource")
 	var plan, state tinesResourceModel
-	var resourceUpdate tines.Resource
+	var resourceUpdate, testResourceUpdate tines.Resource
 
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -363,12 +371,55 @@ func (r *tinesResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		resourceUpdate.Name = plan.Name.ValueString()
 	}
 
+	if !plan.FolderId.IsNull() && !plan.FolderId.IsUnknown() {
+		resourceUpdate.FolderId = int(plan.FolderId.ValueInt64())
+	}
+
+	if !plan.ReadAccess.IsNull() && !plan.ReadAccess.IsUnknown() {
+		resourceUpdate.ReadAccess = plan.ReadAccess.ValueString()
+	}
+
+	if !plan.SharedTeams.IsNull() && !plan.SharedTeams.IsUnknown() {
+		diags = plan.SharedTeams.ElementsAs(ctx, resourceUpdate.SharedTeams, false)
+		if diags.HasError() {
+			return
+		}
+	}
+
+	if !plan.TestEnabled.IsNull() && !plan.TestEnabled.IsUnknown() {
+		resourceUpdate.TestResEnabled = plan.TestEnabled.ValueBool()
+	}
+
+	// Determine whether we are managing both the test and production Tines Resource values
+	// here, or if we are managing this as a test value only. If the combination of `value`
+	// and `test_value` is set, then we treat `value` as the production value. If the `is_test`
+	// and `live_resource_id` values are set, then we treat `value` as the test value.
+	var testValUpdateRequired bool
+
 	if !plan.Value.IsNull() && !plan.Value.IsUnderlyingValueUnknown() {
 		val, diags := utils.GetUnderlyingDynamicValue(ctx, &plan.Value)
 		if diags.HasError() {
 			return
 		}
 		resourceUpdate.Value = val
+	}
+
+	// Check if this is explicitly configured as a test Tines Resource only.
+	if plan.IsTest.ValueBool() {
+		resourceUpdate.LiveResourceId = int(plan.LiveResId.ValueInt64())
+	}
+
+	// Check if this is configured as a combination of test and production values.
+	if !plan.TestValue.IsNull() && !plan.TestValue.IsUnderlyingValueUnknown() {
+		testVal, diags := utils.GetUnderlyingDynamicValue(ctx, &plan.TestValue)
+		if diags.HasError() {
+			return
+		}
+		testResourceUpdate.Id = resourceUpdate.Id
+		testResourceUpdate.IsTest = true
+		testResourceUpdate.Value = testVal
+
+		testValUpdateRequired = true
 	}
 
 	newResource, err := r.client.UpdateResource(ctx, resourceUpdate.Id, &resourceUpdate)
@@ -378,6 +429,17 @@ func (r *tinesResource) Update(ctx context.Context, req resource.UpdateRequest, 
 			"Could not update Tines Resource, unexpected error: "+err.Error(),
 		)
 		return
+	}
+
+	if testValUpdateRequired {
+		newResource, err = r.client.UpdateResource(ctx, testResourceUpdate.Id, &testResourceUpdate)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Error Updating Tines Resource Test Value",
+				"Could not update Tines Resource test value, unexpected error: "+err.Error(),
+			)
+			return
+		}
 	}
 
 	// Populate all the computed values in the plan.
@@ -477,7 +539,11 @@ func (r *tinesResource) convertTinesResourceToPlan(ctx context.Context, plan *ti
 	// Set the computed value of TestResource to nil if one is not enabled - the Tines
 	// API won't return a value for test_resource if one is not enabled.
 	if tr.TestResource != nil {
-		plan.TestResource = types.DynamicValue(types.StringValue(tr.TestResource.(string)))
+		val, _ := tr.TestResource.(map[string]any)
+		plan.TestResource, diags = utils.SetUnderlyingDynamicValue(ctx, val["value"].(string))
+		if diags.HasError() {
+			return diags
+		}
 	} else {
 		plan.TestResource = types.DynamicValue(types.StringValue(""))
 	}

@@ -175,7 +175,7 @@ func SetUnderlyingDynamicValue(ctx context.Context, jsonValue string) (types.Dyn
 }
 
 // convertToTerraformValue recursively converts a parsed JSON value to a Terraform dynamic value
-func convertToTerraformValue(ctx context.Context, value interface{}) (types.Dynamic, diag.Diagnostics) {
+func convertToTerraformValue(ctx context.Context, value any) (types.Dynamic, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	switch v := value.(type) {
@@ -228,7 +228,7 @@ func convertToTerraformValue(ctx context.Context, value interface{}) (types.Dyna
 
 		return types.DynamicValue(tupleValue), diags
 
-	case map[string]interface{}:
+	case map[string]any:
 		tflog.Info(ctx, "Converting object JSON value")
 		objectAttrs := make(map[string]attr.Value)
 		objectTypes := make(map[string]attr.Type)

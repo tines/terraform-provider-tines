@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -77,6 +78,7 @@ func TestAccTinesResource_Array(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
+				// Create the Tines Resource with array value.
 				Config: providerConfig + testAccCreateTinesResourceArrayVal(),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
 					PreApply: []plancheck.PlanCheck{
@@ -95,10 +97,48 @@ func TestAccTinesResource_Array(t *testing.T) {
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
 						"tines_resource.test_example_array",
+						tfjsonpath.New("name"),
+						knownvalue.StringExact("Terraform Test Array Resource"),
+					),
+					statecheck.ExpectKnownValue(
+						"tines_resource.test_example_array",
 						tfjsonpath.New("value"),
-						knownvalue.StringExact("[1,2,3,4]"),
+						knownvalue.TupleExact([]knownvalue.Check{
+							knownvalue.NumberExact(big.NewFloat(1)),
+							knownvalue.NumberExact(big.NewFloat(2)),
+							knownvalue.NumberExact(big.NewFloat(3)),
+						}),
 					),
 				},
+			},
+			{
+				// Update the Tines Resource array value.
+				Config: providerConfig + testAccUpdateTinesResourceArrayVal(),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectNonEmptyPlan(),
+						plancheck.ExpectResourceAction("tines_resource.test_example_array", plancheck.ResourceActionUpdate),
+						plancheck.ExpectKnownValue("tines_resource.test_example_array", tfjsonpath.New("id"), knownvalue.NotNull()),
+					},
+				},
+				ConfigStateChecks: []statecheck.StateCheck{
+					statecheck.ExpectKnownValue(
+						"tines_resource.test_example_array",
+						tfjsonpath.New("value"),
+						knownvalue.TupleExact([]knownvalue.Check{
+							knownvalue.NumberExact(big.NewFloat(1)),
+							knownvalue.NumberExact(big.NewFloat(2)),
+							knownvalue.NumberExact(big.NewFloat(3)),
+							knownvalue.NumberExact(big.NewFloat(4)),
+						}),
+					),
+				},
+			},
+			{
+				// Import the existing Tines Resource.
+				ResourceName:      "tines_resource.test_example_array",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

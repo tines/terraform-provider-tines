@@ -20,6 +20,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/tines/go-sdk/tines"
+
+	"github.com/tines/terraform-provider-tines/internal/utils"
 )
 
 // tinesResource is the resource implementation. Semantically,
@@ -202,7 +204,7 @@ func (r *tinesResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
-	val, diags := r.getUnderlyingDynamicValue(ctx, &plan.Value)
+	val, diags := utils.GetUnderlyingDynamicValue(ctx, &plan.Value)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -362,7 +364,7 @@ func (r *tinesResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	}
 
 	if !plan.Value.IsNull() && !plan.Value.IsUnderlyingValueUnknown() {
-		val, diags := r.getUnderlyingDynamicValue(ctx, &plan.Value)
+		val, diags := utils.GetUnderlyingDynamicValue(ctx, &plan.Value)
 		if diags.HasError() {
 			return
 		}
@@ -457,7 +459,10 @@ func (r *tinesResource) convertTinesResourceToPlan(ctx context.Context, plan *ti
 	// the production value.
 	plan.Id = types.Int64Value(int64(tr.Id))
 	plan.Name = types.StringValue(tr.Name)
-	plan.Value = types.DynamicValue(types.StringValue(tr.Value.(string)))
+	plan.Value, diags = utils.SetUnderlyingDynamicValue(ctx, tr.Value.(string))
+	if diags.HasError() {
+		return diags
+	}
 	plan.Description = types.StringValue(tr.Description)
 	plan.TeamId = types.Int64Value(int64(tr.TeamId))
 	plan.FolderId = types.Int64Value(int64(tr.FolderId))
@@ -484,24 +489,4 @@ func (r *tinesResource) convertTinesResourceToPlan(ctx context.Context, plan *ti
 	plan.UpdatedAt = types.StringValue(tr.UpdatedAt)
 
 	return diags
-}
-
-func (r *tinesResource) getUnderlyingDynamicValue(ctx context.Context, res *types.Dynamic) (any, diag.Diagnostics) {
-	// Handle the underlying value in the dynamic type.
-	var diags diag.Diagnostics
-	switch val := res.UnderlyingValue().(type) {
-	case types.String:
-		tflog.Info(ctx, "Dynamic value is a string")
-		return val.ValueString(), nil
-	case types.Number:
-		tflog.Info(ctx, "Dynamic value is a number")
-		return val.ToNumberValue(ctx)
-	case types.Tuple:
-		tflog.Info(ctx, "Dynamic value is a tuple")
-		return nil, nil
-	}
-
-	tflog.Info(ctx, "Dynamic value is an unsupported type")
-	diags.AddError("Dynamic value is an unsupported type.", "Only String, Number, and Tuple values are supported.")
-	return nil, diags
 }

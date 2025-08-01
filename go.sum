@@ -82,8 +82,8 @@ github.com/hashicorp/terraform-exec v0.22.0 h1:G5+4Sz6jYZfRYUCg6eQgDsqTzkNXV+fP8
 github.com/hashicorp/terraform-exec v0.22.0/go.mod h1:bjVbsncaeh8jVdhttWYZuBGj21FcYw6Ia/XfHcNO7lQ=
 github.com/hashicorp/terraform-json v0.24.0 h1:rUiyF+x1kYawXeRth6fKFm/MdfBS6+lW4NbeATsYz8Q=
 github.com/hashicorp/terraform-json v0.24.0/go.mod h1:Nfj5ubo9xbu9uiAoZVBsNOjvNKB66Oyrvtit74kC7ow=
-github.com/hashicorp/terraform-plugin-framework v1.15.0 h1:LQ2rsOfmDLxcn5EeIwdXFtr03FVsNktbbBci8cOKdb4=
-github.com/hashicorp/terraform-plugin-framework v1.15.0/go.mod h1:hxrNI/GY32KPISpWqlCoTLM9JZsGH3CyYlir09bD/fI=
+github.com/hashicorp/terraform-plugin-framework v1.15.1 h1:2mKDkwb8rlx/tvJTlIcpw0ykcmvdWv+4gY3SIgk8Pq8=
+github.com/hashicorp/terraform-plugin-framework v1.15.1/go.mod h1:hxrNI/GY32KPISpWqlCoTLM9JZsGH3CyYlir09bD/fI=
 github.com/hashicorp/terraform-plugin-framework-validators v0.18.0 h1:OQnlOt98ua//rCw+QhBbSqfW3QbwtVrcdWeQN5gI3Hw=
 github.com/hashicorp/terraform-plugin-framework-validators v0.18.0/go.mod h1:lZvZvagw5hsJwuY7mAY6KUz45/U6fiDR0CzQAwWD0CA=
 github.com/hashicorp/terraform-plugin-go v0.27.0 h1:ujykws/fWIdsi6oTUT5Or4ukvEan4aN9lY+LOxVP8EE=
@@ -150,12 +150,6 @@ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/tines/go-sdk v0.1.0 h1:9rUAQ2n8EeEikSuVCt7RPJM1SWB0e9FQmEpMXf42uAk=
-github.com/tines/go-sdk v0.1.0/go.mod h1:whJ93d2ev22LBHVg2XOJLWXLOcfBDkARz6x0CSJJBD8=
-github.com/tines/go-sdk v0.2.0 h1:Uw6SDxaVVVlwuz0urccqKZ1N/EwxDEsNJJVP9+LA/Bo=
-github.com/tines/go-sdk v0.2.0/go.mod h1:A3eVDxwjiC9lEmZ+X9GBwrDY28CSTSz6bl0BIUbsTQI=
-github.com/tines/go-sdk v0.2.1 h1:M/bRTx62zHe7czPo5snIKGoFz6owJquj+A/mfmubhLw=
-github.com/tines/go-sdk v0.2.1/go.mod h1:A3eVDxwjiC9lEmZ+X9GBwrDY28CSTSz6bl0BIUbsTQI=
 github.com/tines/go-sdk v0.2.2 h1:TzjY6MxA9mbkkjUWJiI+SMC22AA8adLFODQWwvNFZ80=
 github.com/tines/go-sdk v0.2.2/go.mod h1:A3eVDxwjiC9lEmZ+X9GBwrDY28CSTSz6bl0BIUbsTQI=
 github.com/vmihailenco/msgpack v3.3.3+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=

@@ -158,6 +158,7 @@ func (p *TinesProvider) Resources(ctx context.Context) []func() resource.Resourc
 	return []func() resource.Resource{
 		NewStoryResource,
 		NewTinesResource,
+		NewCredentialResource,
 	}
 }
 
